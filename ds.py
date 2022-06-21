@@ -3,7 +3,6 @@ from random import randint
 from PIL import Image
 import numpy as np
 import cv2
-import scipy.misc
 
 li = os.listdir('data/train')
 li = [i for i in li if i.split('.')[-1]== 'jpg']
