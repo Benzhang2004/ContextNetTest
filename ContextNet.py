@@ -1,11 +1,9 @@
-from keras.datasets import mnist
-from keras.layers import Input, Dense, Reshape, Flatten, Embedding, Conv2DTranspose
-from keras.layers import BatchNormalization, Activation, ZeroPadding2D, merge, MaxPool2D
-from keras.layers.advanced_activations import LeakyReLU, ReLU
-from keras.layers.convolutional import UpSampling2D, Conv2D
+from keras.layers import Input, Dense, Reshape, Flatten, Conv2DTranspose
+from keras.layers import BatchNormalization, Activation, MaxPool2D,ReLU
+from keras.layers.convolutional import Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
-import matplotlib.pyplot as plt
+import keras.layers.merge as merge
 import ds
 import numpy as np
 
