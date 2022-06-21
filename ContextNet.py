@@ -122,7 +122,7 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # Load the dataset
-        (X_train, Y_train, y_train) = ds.load_data()
+        (X_train, Y_train, y_train),(X_test, Y_test) = ds.load_data()
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
         X_train = np.expand_dims(X_train, axis=3)

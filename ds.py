@@ -12,6 +12,8 @@ li = [i for i in li if i.split('.')[-1]== 'jpg']
 X_train = []
 Y_train = []
 y_train = []
+Y_test = []
+X_test = []
 
 MAX_VAL = 180
 COLOR_table = []
@@ -40,7 +42,7 @@ def random_polygon(edge_num, center, radius_range):
     return points
 
 
-
+## preprocessing training data
 for (x, item) in enumerate(li):
     im = Image.open('data/train/'+item)
     im = im.resize((227,227))
@@ -58,37 +60,33 @@ for (x, item) in enumerate(li):
     Y_train.append(imgarray)
     ytr = np.asarray(Image.fromarray(imgarray).resize((192,192)))
     y_train.append(ytr)
-    
+
+
+li = os.listdir('data/test')
+li = [i for i in li if i.split('.')[-1]== 'jpg']
+
+for (x, item) in enumerate(li):
+    im = Image.open('data/train/'+item)
+    im = im.resize((227,227))
+    im=im.convert('L')
+    im=im.point(COLOR_table,'L')
+    imgarray = np.asarray(im)
+    X_test.append(np.asarray(im.resize((192,192))))
+    mask = np.zeros((227,227),dtype=np.uint8)
+    r1 = randint(10,114)
+    r2 = randint(10,114)
+    points1 = random_polygon(40, [randint(r1//2,227-r1//2), randint(r2//2,227-r2//2)], [r1, r2])
+    mask = cv2.fillPoly(mask, [points1], (255))
+    mask = np.asarray(mask)
+    imgarray = np.where(mask>0,-1,imgarray)
+    Y_test.append(imgarray)
 
 X_train = np.array(X_train)
 Y_train = np.array(Y_train)
 y_train = np.array(y_train)
+X_test = np.array(X_test)
+Y_test = np.array(Y_test)
 
 def load_data():
-    return (X_train,Y_train,y_train)
-
-
-# def draw_polygon(image_size, points, color):
-#     image = np.zeros(image_size, dtype=np.uint8)
-#     if type(points) is np.ndarray and points.ndim == 2:
-#         image = cv2.fillPoly(image, [points], color)
-#     else:
-#         image = cv2.fillPoly(image, points, color)
-#     return image
-
-
-
-# points1 = random_polygon(10, [80, 80], [70, 70])
-# points2 = random_polygon(10, [80, 180], [20, 50])
-# points3 = random_polygon(3, [180, 80], [20, 50])
-# points4 = random_polygon(5, [180, 180], [20, 50])
-
-# pts = [points1, points2, points3, points4]
-
-# # image1 = draw_polygon((256, 256, 3), points1, (255, 255, 255))
-# image2 = draw_polygon((227, 227, 1), pts, (255))
-# # cv2.imshow('a', image1)
-# cv2.imshow('b', image2)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+    return (X_train,Y_train,y_train),(X_test,Y_test)
 
