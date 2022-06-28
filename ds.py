@@ -65,7 +65,7 @@ li = os.listdir('data/test')
 li = [i for i in li if i.split('.')[-1]== 'jpg']
 
 for (x, item) in enumerate(li):
-    im = Image.open('data/train/'+item)
+    im = Image.open('data/test/'+item)
     im = im.resize((227,227))
     im=im.convert('L')
     im=im.point(COLOR_table,'L')
