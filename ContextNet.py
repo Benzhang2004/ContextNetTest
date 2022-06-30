@@ -6,6 +6,7 @@ from keras.optimizers import adam_v2
 import keras.layers.merge as merge
 import ds
 import numpy as np
+import matplotlib.pyplot as plt
 
 class GAN():
     def __init__(self):
@@ -120,7 +121,7 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # Load the dataset
-        (X_train, Y_train, y_train),(X_test, Y_test) = ds.load_data()
+        (X_train, Y_train, y_train),(self.X_test, self.Y_test) = ds.load_data()
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
         X_train = np.expand_dims(X_train, axis=3)
@@ -171,26 +172,25 @@ class GAN():
                 self.sample_images(epoch)
 
     def sample_images(self, epoch):
-        # r, c = 5, 5
+        idx = np.random.randint(0, self.X_test.shape[0], 1)
         noise = np.random.normal(0, 1, (1,)+self.img_shape)
-        # label = np.asarray([1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5])
-        # gen_imgs = self.generator.predict([noise,label])
+        label = self.Y_test[idx]
+        gen_img = self.generator.predict([noise,label])
 
-        # # Rescale images 0 - 1
-        # gen_imgs = 0.5 * gen_imgs + 0.5
+        # Rescale images 0 - 1
+        gen_img = np.maximum(gen_img,0)
 
-        # fig, axs = plt.subplots(r, c)
-        # cnt = 0
-        # for i in range(r):
-        #     for j in range(c):
-        #         axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
-        #         axs[i,j].axis('off')
-        #         cnt += 1
-        # fig.savefig("images/%d.png" % epoch)
-        # plt.close()
-        pass
+        fig, axs = plt.subplots(1, 3)
+        axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')
+        axs[1].imshow(label[0,:,:], cmap='gray')
+        axs[2].imshow(gen_img[0,:,:,0], cmap='gray')
+        axs[0].axis('off')
+        axs[1].axis('off')
+        axs[2].axis('off')
+        fig.savefig("images/%d.png" % epoch)
+        plt.close()
 
 
 if __name__ == '__main__':
     gan = GAN()
-    gan. train(epochs=30000, batch_size=256, sample_interval=200)
+    gan. train(epochs=30000, batch_size=256, sample_interval=5)
