@@ -3,10 +3,11 @@ from keras.layers import Input, Dense, Reshape, Flatten, Dropout, Embedding
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D, merge
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
-from keras.models import Sequential, Model
+from keras.models import Sequential, Model,load_model
 from keras.optimizers import adam_v2
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 class GAN():
     def __init__(self):
@@ -18,13 +19,25 @@ class GAN():
 
         optimizer = adam_v2.Adam(0.0002, 0.5)
 
-        self.discriminator = self.build_discriminator()
-        self.discriminator.compile(loss='binary_crossentropy',
-            optimizer=optimizer,
-            metrics=['accuracy'])
+        self.epo = 0
+        if(os.path.exists('models/epoch')):
+            with open('models/epoch','r') as f:
+                self.epo = f.read()
+
+        # Load the discriminator
+        if(os.path.exists('models/dis')):
+            self.discriminator = load_model('models/dis')
+        else:
+            self.discriminator = self.build_discriminator()
+            self.discriminator.compile(loss='binary_crossentropy',
+                optimizer=optimizer,
+                metrics=['accuracy'])
 
         # Build the generator
-        self.generator = self.build_generator()
+        if(os.path.exists('models/gen')):
+            self.generator = load_model('models/gen')
+        else:
+            self.generator = self.build_generator()
 
         # The generator takes noise as input and generates imgs
         z = Input(shape=(self.latent_dim,))
@@ -105,7 +118,7 @@ class GAN():
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
 
-        for epoch in range(epochs):
+        for epoch in range(self.epo, epochs):
 
             # ---------------------
             #  Train Discriminator
@@ -160,6 +173,12 @@ class GAN():
                 cnt += 1
         fig.savefig("images/%d.png" % epoch)
         plt.close()
+    
+    def save_models(self, epoch):
+        self.generator.save('models/gen')
+        self.discriminator.save('models/dis')
+        with open('models/epoch','w') as f:
+            f.write(epoch)
 
 
 if __name__ == '__main__':
