@@ -8,6 +8,7 @@ import ds
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import h5py
 
 class GAN():
     def __init__(self):
@@ -21,11 +22,12 @@ class GAN():
 
         self.epo = 0
         if(os.path.exists('epoch')):
-            with open('models/epoch','r') as f:
+            with open('epoch','r') as f:
                 self.epo = int(f.read())
 
         if(os.path.exists('dis.h5')):
-            self.discriminator = load_model(os.path.abspath("dis.h5"))
+            dis_file = h5py.File('dis.h5','r')
+            self.discriminator = load_model(dis_file)
         else:
             self.discriminator = self.build_discriminator()
             self.discriminator.compile(loss='binary_crossentropy',
@@ -34,7 +36,8 @@ class GAN():
 
         # Build the generator
         if(os.path.exists('gen.h5')):
-            self.generator = load_model(os.path.abspath("gen.h5"),compile=False)
+            gen_file = h5py.File('gen.h5','r')
+            self.generator = load_model(gen_file,compile=False)
         else:
             self.generator = self.build_generator()
 
@@ -179,10 +182,11 @@ class GAN():
             # Plot the progress
             print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss))
 
+            self.cur_iter = epoch
+
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
-                self.save_models(epoch)
 
     def sample_images(self, epoch):
         idx = np.random.randint(0, self.X_test.shape[0], 1)
@@ -203,13 +207,19 @@ class GAN():
         fig.savefig("images/%d.png" % epoch)
         plt.close()
 
-    def save_models(self, epoch):
+    def save_models(self):
         self.generator.save('gen.h5',save_format='h5')
+        print("Saved generator!")
         self.discriminator.save('dis.h5',save_format='h5')
+        print("Saved discriminator!")
         with open('epoch','w') as f:
-            f.write(str(epoch))
+            f.write(str(self.cur_iter))
 
 
 if __name__ == '__main__':
     gan = GAN()
-    gan. train(epochs=30000, batch_size=256, sample_interval=5)
+    try:
+        gan. train(epochs=30000, batch_size=256, sample_interval=5)
+    except KeyboardInterrupt as err:
+        print("Saving Models ...")
+        gan. save_models()
