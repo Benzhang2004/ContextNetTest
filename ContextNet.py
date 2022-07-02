@@ -110,7 +110,7 @@ class GAN():
         
         tmp = merge.minimum([label,np.zeros((1,)+self.img_gen_shape)])
         tmp = merge.multiply([tmp,img])
-        # tmp = merge.multiply([tmp,np.negative(np.ones(self.img_gen_shape))])
+        tmp = merge.multiply([tmp,np.multiply(np.ones((1,)+self.img_gen_shape),-1)])
         tmp2 = merge.maximum([label,np.zeros((1,)+self.img_gen_shape)])
         comp = merge.add([tmp,tmp2])
 
