@@ -1,12 +1,13 @@
 from keras.layers import Input, Dense, Reshape, Flatten, Conv2DTranspose
 from keras.layers import BatchNormalization, Activation, MaxPool2D,ReLU
 from keras.layers.convolutional import Conv2D
-from keras.models import Sequential, Model
+from keras.models import Sequential, Model,load_model
 from keras.optimizers import adam_v2
 import keras.layers.merge as merge
 import ds
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 class GAN():
     def __init__(self):
@@ -18,13 +19,24 @@ class GAN():
 
         optimizer = adam_v2.Adam(0.0002, 0.5)
 
-        self.discriminator = self.build_discriminator()
-        self.discriminator.compile(loss='binary_crossentropy',
-            optimizer=optimizer,
-            metrics=['accuracy'])
+        self.epo = 0
+        if(os.path.exists('epoch')):
+            with open('models/epoch','r') as f:
+                self.epo = int(f.read())
+
+        if(os.path.exists('dis.h5')):
+            self.discriminator = load_model(os.path.abspath("dis.h5"))
+        else:
+            self.discriminator = self.build_discriminator()
+            self.discriminator.compile(loss='binary_crossentropy',
+                optimizer=optimizer,
+                metrics=['accuracy'])
 
         # Build the generator
-        self.generator = self.build_generator()
+        if(os.path.exists('gen.h5')):
+            self.generator = load_model(os.path.abspath("gen.h5"),compile=False)
+        else:
+            self.generator = self.build_generator()
 
         # The generator takes noise as input and generates imgs
         z = Input(shape=self.img_shape)
@@ -133,7 +145,7 @@ class GAN():
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
 
-        for epoch in range(epochs):
+        for epoch in range(self.epo, epochs):
 
             # ---------------------
             #  Train Discriminator
@@ -170,6 +182,7 @@ class GAN():
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
+                self.save_models(epoch)
 
     def sample_images(self, epoch):
         idx = np.random.randint(0, self.X_test.shape[0], 1)
@@ -189,6 +202,12 @@ class GAN():
         axs[2].axis('off')
         fig.savefig("images/%d.png" % epoch)
         plt.close()
+
+    def save_models(self, epoch):
+        self.generator.save('gen.h5',save_format='h5')
+        self.discriminator.save('dis.h5',save_format='h5')
+        with open('epoch','w') as f:
+            f.write(str(epoch))
 
 
 if __name__ == '__main__':
