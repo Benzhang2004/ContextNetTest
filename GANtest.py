@@ -22,11 +22,11 @@ class GAN():
         self.epo = 0
         if(os.path.exists('models/epoch')):
             with open('models/epoch','r') as f:
-                self.epo = f.read()
+                self.epo = int(f.read())
 
         # Load the discriminator
-        if(os.path.exists('models/dis')):
-            self.discriminator = load_model('models/dis')
+        if(os.path.exists('models/dis.h5')):
+            self.discriminator = load_model('models/dis.h5')
         else:
             self.discriminator = self.build_discriminator()
             self.discriminator.compile(loss='binary_crossentropy',
@@ -34,8 +34,8 @@ class GAN():
                 metrics=['accuracy'])
 
         # Build the generator
-        if(os.path.exists('models/gen')):
-            self.generator = load_model('models/gen')
+        if(os.path.exists('models/gen.h5')):
+            self.generator = load_model('models/gen.h5')
         else:
             self.generator = self.build_generator()
 
@@ -154,6 +154,7 @@ class GAN():
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
                 self.sample_images(epoch)
+                self.save_models(epoch)
 
     def sample_images(self, epoch):
         r, c = 5, 5
@@ -175,10 +176,10 @@ class GAN():
         plt.close()
     
     def save_models(self, epoch):
-        self.generator.save('models/gen')
-        self.discriminator.save('models/dis')
+        self.generator.save('models/gen.h5')
+        self.discriminator.save('models/dis.h5')
         with open('models/epoch','w') as f:
-            f.write(epoch)
+            f.write(str(epoch))
 
 
 if __name__ == '__main__':
