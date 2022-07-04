@@ -24,21 +24,23 @@ class GAN():
             with open('models/epoch','r') as f:
                 self.epo = int(f.read())
 
-        # Load the discriminator
+        # Build the discriminator
+        self.discriminator = self.build_discriminator()
+        self.discriminator.compile(loss='binary_crossentropy',
+            optimizer=optimizer,
+            metrics=['accuracy'])
+
+        # Load the discriminator weights
         if(os.path.exists('models/dis.h5')):
-            self.discriminator = load_model('models/dis.h5')
-        else:
-            self.discriminator = self.build_discriminator()
-            self.discriminator.compile(loss='binary_crossentropy',
-                optimizer=optimizer,
-                metrics=['accuracy'])
+            self.discriminator.load_weights('models/dis.h5')
 
         # Build the generator
-        if(os.path.exists('models/gen.h5')):
-            self.generator = load_model('models/gen.h5')
-        else:
-            self.generator = self.build_generator()
+        self.generator = self.build_generator()
 
+        # Load the generator weights
+        if(os.path.exists('models/gen.h5')):
+            self.generator.load_weights('models/gen.h5')
+        
         # The generator takes noise as input and generates imgs
         z = Input(shape=(self.latent_dim,))
         label = Input(shape=(1,))
@@ -176,8 +178,8 @@ class GAN():
         plt.close()
     
     def save_models(self, epoch):
-        self.generator.save('models/gen.h5')
-        self.discriminator.save('models/dis.h5')
+        self.generator.save_weights('models/gen.h5')
+        self.discriminator.save_weights('models/dis.h5')
         with open('models/epoch','w') as f:
             f.write(str(epoch))
 

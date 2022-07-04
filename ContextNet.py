@@ -217,10 +217,11 @@ class GAN():
     def save_models(self):
         self.generator.save_weights('models/gen.h5')
         self.discriminator.save_weights('models/dis.h5')
+        a = self.discriminator.to_json()
         with open('models/epoch','w') as f:
             f.write(str(self.cur_iter))
 
 
 if __name__ == '__main__':
     gan = GAN()
-    gan. train(epochs=10, batch_size=256, sample_interval=5)
+    gan. train(epochs=5, batch_size=256, sample_interval=5)
