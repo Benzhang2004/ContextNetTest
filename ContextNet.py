@@ -193,7 +193,7 @@ class GAN():
                 self.sample_images(epoch)
         
         # Save Models
-        self.save_models()
+                self.save_models()
 
     def sample_images(self, epoch):
         idx = np.random.randint(0, self.X_test.shape[0], 1)
@@ -224,4 +224,4 @@ class GAN():
 
 if __name__ == '__main__':
     gan = GAN()
-    gan. train(epochs=15, batch_size=256, sample_interval=5)
+    gan. train(epochs=100000, batch_size=300, sample_interval=100)
