@@ -136,7 +136,7 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # Load the dataset
-        (X_train, Y_train, y_train),(self.X_test, self.Y_test) = ds.load_data()
+        (X_train, Y_train, y_train),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
         X_train = np.expand_dims(X_train, axis=3)
@@ -201,16 +201,17 @@ class GAN():
         noise = np.random.normal(0, 1, (1,)+self.img_shape)
         label = self.Y_test[idx]
         gen_img = self.generator.predict([noise,label])
+        label_gen = self.y_test[idx]
 
         # Rescale images 0 - 1
         gen_img = np.maximum(gen_img,0)
 
         # Shaped images
-        tmp = np.minimum(label[0,:,:],0)
+        tmp = np.minimum(label_gen[0,:,:],0)
         tmp = np.multiply(tmp,gen_img[0,:,:,0])
         tmp = np.multiply(tmp,-1)
-        tmp2 = np.maximum(label[0,:,:],0)
-        shaped_img = np.add([tmp,tmp2])
+        tmp2 = np.maximum(label_gen[0,:,:],0)
+        shaped_img = np.add(tmp,tmp2)
 
         fig, axs = plt.subplots(1, 4)
         axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')
