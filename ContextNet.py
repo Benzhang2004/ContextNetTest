@@ -170,8 +170,8 @@ class GAN():
             gen_imgs = self.generator.predict([noise,labels])
 
             # Train the discriminator
-            d_loss_real = self.discriminator.fit([imgs,labels_gen], valid, epochs=10, verbose=0)
-            d_loss_fake = self.discriminator.fit([gen_imgs,labels_gen], fake, epochs=10, verbose=0)
+            d_loss_real = self.discriminator.fit([imgs,labels_gen], valid, epochs=2, verbose=0)
+            d_loss_fake = self.discriminator.fit([gen_imgs,labels_gen], fake, epochs=2, verbose=0)
             d_loss = 0.5 * (d_loss_real.history['loss'][-1] + d_loss_fake.history['loss'][-1])
             d_loss_acc = 0.5 * (d_loss_real.history['accuracy'][-1] + d_loss_fake.history['accuracy'][-1])
 
@@ -205,13 +205,22 @@ class GAN():
         # Rescale images 0 - 1
         gen_img = np.maximum(gen_img,0)
 
-        fig, axs = plt.subplots(1, 3)
+        # Shaped images
+        tmp = np.minimum(label[0,:,:],0)
+        tmp = np.multiply(tmp,gen_img[0,:,:,0])
+        tmp = np.multiply(tmp,-1)
+        tmp2 = np.maximum(label[0,:,:],0)
+        shaped_img = np.add([tmp,tmp2])
+
+        fig, axs = plt.subplots(1, 4)
         axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')
         axs[1].imshow(label[0,:,:], cmap='gray')
         axs[2].imshow(gen_img[0,:,:,0], cmap='gray')
+        axs[3].imshow(shaped_img, cmap='gray')
         axs[0].axis('off')
         axs[1].axis('off')
         axs[2].axis('off')
+        axs[3].axis('off')
         fig.savefig("images/%d.png" % epoch)
         plt.close()
 
