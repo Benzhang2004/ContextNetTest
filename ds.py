@@ -13,6 +13,7 @@ Y_train = []
 y_train = []
 Y_test = []
 X_test = []
+y_test = []
 
 MAX_VAL = 180
 COLOR_table = []
@@ -79,13 +80,16 @@ for (x, item) in enumerate(li):
     mask = np.asarray(mask)
     imgarray = np.where(mask>0,-1,imgarray)
     Y_test.append(imgarray)
+    yte = np.asarray(Image.fromarray(imgarray).resize((192,192)))
+    y_test.append(yte)
 
 X_train = np.array(X_train)
 Y_train = np.array(Y_train)
 y_train = np.array(y_train)
 X_test = np.array(X_test)
 Y_test = np.array(Y_test)
+y_test = np.array(y_test)
 
 def load_data():
-    return (X_train,Y_train,y_train),(X_test,Y_test)
+    return (X_train,Y_train,y_train),(X_test,Y_test,y_test)
 
