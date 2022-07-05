@@ -19,6 +19,12 @@ class GAN():
 
         optimizer = adam_v2.Adam(0.0002, 0.5)
 
+        # Create Dirs
+        if(not os.path.exists('models')):
+            os.mkdir('models')
+        if(not os.path.exists('images')):
+            os.mkdir('images')
+
         self.epo = 0
         if(os.path.exists('models/epoch')):
             with open('models/epoch','r') as f:
