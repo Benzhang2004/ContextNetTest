@@ -206,17 +206,27 @@ class GAN():
         noise = np.random.normal(0, 1, (1,)+self.img_shape)
         label = self.Y_test[idx]
         gen_img = self.generator.predict([noise,label])
+        label_gen = self.y_test[idx]
 
         # Rescale images 0 - 1
         gen_img = np.maximum(gen_img,0)
 
-        fig, axs = plt.subplots(1, 3)
+        # Shaped images
+        tmp = np.minimum(label_gen[0,:,:],0)
+        tmp = np.multiply(tmp,gen_img[0,:,:,0])
+        tmp = np.multiply(tmp,-1)
+        tmp2 = np.maximum(label_gen[0,:,:],0)
+        shaped_img = np.add(tmp,tmp2)
+
+        fig, axs = plt.subplots(1, 4)
         axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')
         axs[1].imshow(label[0,:,:], cmap='gray')
         axs[2].imshow(gen_img[0,:,:,0], cmap='gray')
+        axs[3].imshow(shaped_img, cmap='gray')
         axs[0].axis('off')
         axs[1].axis('off')
         axs[2].axis('off')
+        axs[3].axis('off')
         fig.savefig("images/%d.png" % epoch)
         plt.close()
 
