@@ -172,7 +172,7 @@ class GAN():
             # Train the discriminator
             d_loss_real = self.discriminator.fit([imgs,labels_gen], valid, epochs=10, verbose=0)
             d_loss_fake = self.discriminator.fit([gen_imgs,labels_gen], fake, epochs=10, verbose=0)
-            # d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+            d_loss = 0.5 * np.add(d_loss_real.history['loss'][-1], d_loss_fake.history['loss'][-1])
 
             # ---------------------
             #  Train Generator
@@ -182,9 +182,9 @@ class GAN():
 
             # Train the generator (to have the discriminator label samples as valid)
             g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=10, verbose=0)
-
+            
             # Plot the progress
-            print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, 0, 100, 0))
+            print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss.history['loss'][-1]))
 
             self.cur_iter = epoch
 
