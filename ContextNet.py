@@ -3,6 +3,7 @@ from keras.layers import BatchNormalization, Activation, MaxPool2D,ReLU
 from keras.layers.convolutional import Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
+import tensorflow as tf
 import keras.layers.merge as merge
 import ds
 import numpy as np
@@ -151,7 +152,12 @@ class GAN():
         X_train = np.expand_dims(X_train, axis=3)
         Y_train = np.expand_dims(Y_train, axis=3)
         y_train = np.expand_dims(y_train, axis=3)
-        # batch_size = X_train.shape[0]
+
+        # Load TF dataset
+        tfX_train = tf.data.Dataset.from_tensor_slices(X_train)
+        tfY_train = tf.data.Dataset.from_tensor_slices(Y_train)
+        tfy_train = tf.data.Dataset.from_tensor_slices(y_train)
+        dataset = tf.data.Dataset.zip((tfX_train,tfY_train,tfy_train))
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -168,10 +174,10 @@ class GAN():
             # ---------------------
 
             # Select a random batch of images
-            idx = np.random.randint(0, X_train.shape[0], batch_size)
-            imgs = X_train[idx]
-            labels = Y_train[idx]
-            labels_gen = y_train[idx]
+            sfds = next(iter(dataset.shuffle(buffer_size=X_train.shape[0],reshuffle_each_iteration=False).batch(batch_size)))
+            imgs = sfds[0]
+            labels = sfds[1]
+            labels_gen = sfds[2]
 
             noise = np.random.normal(0, 1, (batch_size,)+self.img_shape)
 
