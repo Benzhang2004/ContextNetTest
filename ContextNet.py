@@ -168,7 +168,7 @@ class GAN():
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
 
-        epoch = 0
+        epoch = self.epo
         for item in dataset:
             
             # Interrupt training
