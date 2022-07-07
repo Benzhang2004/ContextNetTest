@@ -1,8 +1,5 @@
-from random import randint
-from turtle import shape
-from keras.layers import Input, Dense, Reshape, Flatten, Conv2DTranspose
-from keras.layers import BatchNormalization, Activation, MaxPool2D,ReLU
-from keras.layers.convolutional import Conv2D
+from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU
+from keras.layers import BatchNormalization
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
 import tensorflow as tf
@@ -71,36 +68,22 @@ class GAN():
     def build_generator(self):
 
         model = Sequential()
-        model.add(Input(shape=self.img_shape))
-        model.add(Conv2D(96,(11,11),strides=(4,4),activation='relu',name='conv1'))
-        model.add(MaxPool2D((3,3),strides=(2,2),name='maxpool1'))
-        model.add(Conv2D(256,(5,5),strides=(1,1),padding='same',activation='relu',name="conv2"))
-        model.add(MaxPool2D((3,3),strides=(2,2),name='maxpool2'))
-        model.add(Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',name='conv3'))
-        model.add(Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',name='conv4'))
-        model.add(Conv2D(256,(3,3),strides=(1,1),padding='same',activation='relu',name='conv5'))
-        model.add(MaxPool2D((3,3),strides=(2,2),name='maxpool3'))
+
         model.add(Flatten())
         model.add(Dense(9216))
-        model.add(Dense(9216))
-        model.add(Dense(9216))
-        model.add(Dense(9216))
-        model.add(Reshape((6,6,256)))
-        model.add(Conv2DTranspose(128,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(64,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(64,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(32,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(1,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(Activation('sigmoid'))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Dense(18432))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Dense(36864))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Dense(18432))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Dense(np.prod(self.img_gen_shape), activation='tanh'))
+        model.add(Reshape(self.img_gen_shape))
 
         noise = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
@@ -116,21 +99,12 @@ class GAN():
 
         model = Sequential()
         
-        model.add(Input(shape=self.img_gen_shape))
-        model.add(Conv2D(32,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2D(64,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2D(128,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2D(256,(5,5),strides=(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
         model.add(Flatten())
-        model.add(Dense(1, activation="sigmoid"))
+        model.add(Dense(18432))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dense(9216))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(Dense(1, activation='sigmoid'))
 
         img = Input(shape=self.img_gen_shape)
         label = Input(shape=self.img_gen_shape)
