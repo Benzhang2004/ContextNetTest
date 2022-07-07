@@ -11,11 +11,11 @@ import os
 
 class GAN():
     def __init__(self):
-        self.img_rows = 227
-        self.img_cols = 227
+        self.img_rows = 64
+        self.img_cols = 64
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.img_gen_shape = (192,192,1)
+        self.img_gen_shape = (64,64,1)
 
         optimizer = adam_v2.Adam(0.0002, 0.5)
 
