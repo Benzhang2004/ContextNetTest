@@ -70,9 +70,6 @@ class GAN():
         model = Sequential()
 
         model.add(Flatten())
-        model.add(Dense(9216))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
         model.add(Dense(18432))
         model.add(LeakyReLU(alpha=0.2))
         model.add(BatchNormalization(momentum=0.8))
@@ -142,7 +139,7 @@ class GAN():
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
 
-        epoch = 0
+        epoch = self.epo
         for item in dataset:
             
             # Interrupt training
@@ -233,4 +230,4 @@ class GAN():
 
 if __name__ == '__main__':
     gan = GAN()
-    gan. train(epochs=100000, batch_size=256, sample_interval=50)
+    gan. train(epochs=100000, batch_size=256, sample_interval=5)
