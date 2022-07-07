@@ -1,3 +1,5 @@
+from random import randint
+from turtle import shape
 from keras.layers import Input, Dense, Reshape, Flatten, Conv2DTranspose
 from keras.layers import BatchNormalization, Activation, MaxPool2D,ReLU
 from keras.layers.convolutional import Conv2D
@@ -143,27 +145,31 @@ class GAN():
     
         return Model([img, label], validity)
 
+
+
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # Load the dataset
-        (X_train, Y_train, y_train),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
+        (_,_,_),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
-        X_train = np.expand_dims(X_train, axis=3)
-        Y_train = np.expand_dims(Y_train, axis=3)
-        y_train = np.expand_dims(y_train, axis=3)
+        ds.epo = self.epo
+        ds.batch_size = batch_size
+        ds.epochs = epochs
+        ds.init_data()
 
         # Load TF dataset
-        tfX_train = tf.data.Dataset.from_tensor_slices(X_train)
-        tfY_train = tf.data.Dataset.from_tensor_slices(Y_train)
-        tfy_train = tf.data.Dataset.from_tensor_slices(y_train)
-        dataset = tf.data.Dataset.zip((tfX_train,tfY_train,tfy_train))
+        tfXtrain = tf.data.Dataset.from_generator(ds._gen_Xtrain,output_signature=(tf.TensorSpec(shape=self.img_gen_shape,dtype=tf.float32)),args=())
+        tfYtrain = tf.data.Dataset.from_generator(ds._gen_Ytrain,output_signature=(tf.TensorSpec(shape=self.img_shape,dtype=tf.float32)),args=())
+        tfytrain = tf.data.Dataset.from_generator(ds._gen_ytrain,output_signature=(tf.TensorSpec(shape=self.img_gen_shape,dtype=tf.float32)),args=())
+        dataset = tf.data.Dataset.zip((tfXtrain,tfYtrain,tfytrain)).batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
 
-        for epoch in range(self.epo, epochs):
+        epoch = 0
+        for item in dataset:
             
             # Interrupt training
             # if(keyboard.is_pressed('q')):
@@ -174,10 +180,9 @@ class GAN():
             # ---------------------
 
             # Select a random batch of images
-            sfds = next(iter(dataset.shuffle(buffer_size=X_train.shape[0],reshuffle_each_iteration=False).batch(batch_size)))
-            imgs = sfds[0]
-            labels = sfds[1]
-            labels_gen = sfds[2]
+            imgs = item[0]
+            labels = item[1]
+            labels_gen = item[2]
 
             noise = np.random.normal(0, 1, (batch_size,)+self.img_shape)
 
@@ -210,6 +215,10 @@ class GAN():
         
         # Save Models
                 self.save_models()
+            
+
+            epoch += 1
+            
 
     def sample_images(self, epoch):
         idx = np.random.randint(0, self.X_test.shape[0], 1)

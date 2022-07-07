@@ -93,3 +93,59 @@ y_test = np.array(y_test)
 def load_data():
     return (X_train,Y_train,y_train),(X_test,Y_test,y_test)
 
+
+# Train datasets generators
+
+epo_cur = 0
+
+epo = 0
+idxs = []
+genX_cur = 0
+genY_cur = 0
+geny_cur = 0
+batch_size = 0
+epochs = 0
+
+def init_data():
+    global X_train,Y_train,y_train,idxs
+    X_train = np.expand_dims(X_train, axis=3)
+    Y_train = np.expand_dims(Y_train, axis=3)
+    y_train = np.expand_dims(y_train, axis=3)
+    idxs += list(np.random.randint(0, X_train.shape[0], batch_size*10))
+
+def _gen_Xtrain():
+    global genX_cur
+    for i in range(epo, epochs):
+        for j in range(batch_size):
+            Xx = X_train[idxs[genX_cur]]
+            genX_cur+=1
+            yield Xx
+            gc()
+
+def _gen_Ytrain():
+    global genY_cur
+    for i in range(epo, epochs):
+        for j in range(batch_size):
+            Yx = Y_train[idxs[genY_cur]]
+            genY_cur+=1
+            yield Yx
+            gc()
+
+def _gen_ytrain():
+    global geny_cur
+    for i in range(epo, epochs):
+        for j in range(batch_size):
+            y = y_train[idxs[geny_cur]]
+            geny_cur+=1
+            yield y
+            gc()
+
+def gc():
+    global genX_cur,genY_cur,geny_cur, idxs
+    a = max(min(genX_cur,genY_cur,geny_cur),1)
+    idxs = idxs[a-1:]
+    genX_cur -= a-1
+    genY_cur -= a-1
+    geny_cur -= a-1
+    if(max(genX_cur,genY_cur,geny_cur)>len(idxs)-5):
+        idxs += list(np.random.randint(0, X_train.shape[0], batch_size*10))
