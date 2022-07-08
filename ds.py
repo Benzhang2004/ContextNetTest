@@ -4,8 +4,11 @@ from PIL import Image
 import numpy as np
 import cv2
 
-li = os.listdir('data/train')
-li = [i for i in li if i.split('.')[-1]== 'jpg']
+l = os.listdir('data/train')
+l = [i for i in l if os.path.isdir('data/train/'+i)]
+li = []
+for p in l:
+    li += ['data/train/'+p+'/'+i for i in os.listdir('data/train/'+p) if i.split('.')[-1]== 'jpg']
 
 
 X_train = []
@@ -44,7 +47,7 @@ def random_polygon(edge_num, center, radius_range):
 
 ## preprocessing training data
 for (x, item) in enumerate(li):
-    im = Image.open('data/train/'+item)
+    im = Image.open(item)
     im = im.resize((64,64))
     im=im.convert('L')
     im=im.point(COLOR_table,'L')
