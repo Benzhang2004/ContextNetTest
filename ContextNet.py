@@ -1,5 +1,4 @@
-from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU
-from keras.layers import BatchNormalization
+from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
 import tensorflow as tf
@@ -69,21 +68,14 @@ class GAN():
 
         model = Sequential()
 
-        model.add(Flatten())
-        model.add(Dense(4096))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(8192))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(8192))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(4096))
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.8))
-        model.add(Dense(np.prod(self.img_gen_shape), activation='tanh'))
-        model.add(Reshape(self.img_gen_shape))
+        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
+        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
+        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
+        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
+        model.add(Dense(5000))
+        model.add(Conv2DTranspose(512))
+
+
 
         noise = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
