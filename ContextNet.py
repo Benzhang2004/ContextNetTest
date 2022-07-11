@@ -78,7 +78,7 @@ class GAN():
         model.add(Dense(8192))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
-        model.add(Reshape(4,4,512))
+        model.add(Reshape((4,4,512)))
         model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
         model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
         model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
