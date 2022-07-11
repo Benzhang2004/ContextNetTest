@@ -16,7 +16,7 @@ class GAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.img_gen_shape = (64,64,1)
 
-        optimizer = adam_v2.Adam(0.0002, 0.5)
+        optimizer = adam_v2.Adam(0.0000002, 0.5)
 
         # Create Dirs
         if(not os.path.exists('models')):
@@ -238,5 +238,9 @@ class GAN():
 
 
 if __name__ == '__main__':
+    
+    gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=11264)])
+
     gan = GAN()
     gan. train(epochs=100000, batch_size=512, sample_interval=50)
