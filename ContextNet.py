@@ -182,7 +182,7 @@ class GAN():
             noise = np.random.normal(0, 1, (batch_size,)+self.img_shape)
 
             # Train the generator (to have the discriminator label samples as valid)
-            g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=10, verbose=0)
+            g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=20, verbose=0)
             
             # Plot the progress
             print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, g_loss.history['loss'][-1]))
