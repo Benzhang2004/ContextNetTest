@@ -170,8 +170,8 @@ class GAN():
             gen_imgs = self.generator.predict([noise,labels])
 
             # Train the discriminator
-            d_loss_real = self.discriminator.fit([imgs,labels_gen], valid, epochs=2, verbose=0)
-            d_loss_fake = self.discriminator.fit([gen_imgs,labels_gen], fake, epochs=2, verbose=0)
+            d_loss_real = self.discriminator.fit([imgs,labels_gen], valid, epochs=4, verbose=0)
+            d_loss_fake = self.discriminator.fit([gen_imgs,labels_gen], fake, epochs=4, verbose=0)
             d_loss = 0.5 * (d_loss_real.history['loss'][-1] + d_loss_fake.history['loss'][-1])
             d_loss_acc = 0.5 * (d_loss_real.history['accuracy'][-1] + d_loss_fake.history['accuracy'][-1])
 
