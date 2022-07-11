@@ -80,8 +80,6 @@ class GAN():
         model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
 
-
-
         noise = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
 
