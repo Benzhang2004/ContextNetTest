@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose
+from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
 import tensorflow as tf
@@ -61,7 +61,7 @@ class GAN():
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
         self.combined = Model([z,label, label_gen], validity)
-        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
+        self.combined.compile(loss='binary_crossentropy', optimizer=adam_v2.Adam(0.001, 0.5))
 
 
     def build_generator(self):
@@ -83,6 +83,8 @@ class GAN():
         model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
         model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization())
+        model.add(Activation('sigmoid'))
 
         noise = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
