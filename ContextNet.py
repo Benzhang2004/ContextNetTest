@@ -72,8 +72,13 @@ class GAN():
         model.add(Conv2D(128,(4,4),(2,2),padding='same'))
         model.add(Conv2D(256,(4,4),(2,2),padding='same'))
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(Dense(5000))
-        model.add(Conv2DTranspose(512))
+        model.add(Flatten())
+        model.add(Dense(8192))
+        model.add(Reshape(4,4,512))
+        model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
+        model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
+        model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
+        model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
 
 
 
