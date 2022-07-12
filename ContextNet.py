@@ -16,7 +16,7 @@ class GAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.img_gen_shape = (64,64,1)
 
-        optimizer = adam_v2.Adam(0.0000002, 0.5)
+        optimizer = adam_v2.Adam(0.00002, 0.5)
 
         # Create Dirs
         if(not os.path.exists('models')):
@@ -61,7 +61,7 @@ class GAN():
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
         self.combined = Model([z,label, label_gen], validity)
-        self.combined.compile(loss='binary_crossentropy', optimizer=adam_v2.Adam(0.000002, 0.5))
+        self.combined.compile(loss='binary_crossentropy', optimizer=adam_v2.Adam(0.0002, 0.5))
 
 
     def build_generator(self):
