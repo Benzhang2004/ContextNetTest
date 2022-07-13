@@ -97,6 +97,22 @@ def load_data():
     return (X_train,Y_train,y_train),(X_test,Y_test,y_test)
 
 
+def remask(idx):
+    imgarray = X_train[idx,:,:,1]
+    mask = np.zeros((64,64),dtype=np.uint8)
+    r1 = randint(3,16)
+    r2 = randint(3,16)
+    points1 = random_polygon(40, [randint(r1//2,64-r1//2), randint(r2//2,64-r2//2)], [r1, r2])
+    mask = cv2.fillPoly(mask, [points1], (255))
+    mask = np.asarray(mask)
+    imgarray = np.where(mask>0,-1,imgarray)
+    global Y_train, y_train
+    Y_train[idx] = np.expand_dims(imgarray, axis=2)
+    # ytr = np.asarray(Image.fromarray(imgarray).resize((64,64)))
+    ytr = imgarray
+    y_train[idx] = np.expand_dims(ytr, axis=2)
+
+
 # Train datasets generators
 
 epo_cur = 0
@@ -121,6 +137,8 @@ def _gen_Xtrain():
     for i in range(epo, epochs):
         for j in range(batch_size):
             Xx = X_train[idxs[genX_cur]]
+            if(genX_cur<min(genY_cur,geny_cur)):
+                remask(idxs[genX_cur])
             genX_cur+=1
             yield Xx
             gc()
@@ -130,6 +148,8 @@ def _gen_Ytrain():
     for i in range(epo, epochs):
         for j in range(batch_size):
             Yx = Y_train[idxs[genY_cur]]
+            if(genY_cur<min(genX_cur,geny_cur)):
+                remask(idxs[genY_cur])
             genY_cur+=1
             yield Yx
             gc()
@@ -139,16 +159,18 @@ def _gen_ytrain():
     for i in range(epo, epochs):
         for j in range(batch_size):
             y = y_train[idxs[geny_cur]]
+            if(geny_cur<min(genY_cur,genX_cur)):
+                remask(idxs[geny_cur])
             geny_cur+=1
             yield y
             gc()
 
 def gc():
     global genX_cur,genY_cur,geny_cur, idxs
-    a = max(min(genX_cur,genY_cur,geny_cur),1)
-    idxs = idxs[a-1:]
-    genX_cur -= a-1
-    genY_cur -= a-1
-    geny_cur -= a-1
+    a = min(genX_cur,genY_cur,geny_cur)
+    idxs = idxs[a:]
+    genX_cur -= a
+    genY_cur -= a
+    geny_cur -= a
     if(max(genX_cur,genY_cur,geny_cur)>len(idxs)-5):
         idxs += list(np.random.randint(0, X_train.shape[0], batch_size*10))
