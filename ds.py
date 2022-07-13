@@ -98,7 +98,7 @@ def load_data():
 
 
 def remask(idx):
-    imgarray = X_train[idx,:,:,1]
+    imgarray = X_train[idx,:,:,0]
     mask = np.zeros((64,64),dtype=np.uint8)
     r1 = randint(3,16)
     r2 = randint(3,16)
