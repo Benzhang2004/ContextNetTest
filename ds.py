@@ -1,4 +1,5 @@
 import os
+from keras.datasets import mnist
 from random import randint
 from PIL import Image
 import numpy as np
@@ -17,6 +18,8 @@ y_train = []
 Y_test = []
 X_test = []
 y_test = []
+
+(X_train, _), (X_test, _) = mnist.load_data()
 
 MAX_VAL = 180
 COLOR_table = []
@@ -46,44 +49,34 @@ def random_polygon(edge_num, center, radius_range):
 
 
 ## preprocessing training data
-for (x, item) in enumerate(li):
-    im = Image.open(item)
-    im = im.resize((32,32))
-    im=im.convert('L')
-    im=im.point(COLOR_table,'L')
-    imgarray = np.asarray(im)
-    X_train.append(np.asarray(im.resize((32,32))))
-    mask = np.zeros((32,32),dtype=np.uint8)
+for (x, item) in enumerate(X_train):
+    imgarray = np.asarray(item)
+    mask = np.zeros((28,28),dtype=np.uint8)
     r1 = randint(3,16)
     r2 = randint(3,16)
-    points1 = random_polygon(40, [randint(r1//2,32-r1//2), randint(r2//2,32-r2//2)], [r1, r2])
+    points1 = random_polygon(40, [randint(r1//2,28-r1//2), randint(r2//2,28-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [points1], (255))
     mask = np.asarray(mask)
     imgarray = np.where(mask>0,-1,imgarray)
     Y_train.append(imgarray)
-    ytr = np.asarray(Image.fromarray(imgarray).resize((32,32)))
+    ytr = np.asarray(Image.fromarray(imgarray).resize((28,28)))
     y_train.append(ytr)
 
 
 li = os.listdir('data/test')
 li = [i for i in li if i.split('.')[-1]== 'jpg']
 
-for (x, item) in enumerate(li):
-    im = Image.open('data/test/'+item)
-    im = im.resize((32,32))
-    im=im.convert('L')
-    im=im.point(COLOR_table,'L')
-    imgarray = np.asarray(im)
-    X_test.append(np.asarray(im.resize((32,32))))
-    mask = np.zeros((32,32),dtype=np.uint8)
+for (x, item) in enumerate(X_test):
+    imgarray = np.asarray(item)
+    mask = np.zeros((28,28),dtype=np.uint8)
     r1 = randint(3,16)
     r2 = randint(3,16)
-    points1 = random_polygon(40, [randint(r1//2,32-r1//2), randint(r2//2,32-r2//2)], [r1, r2])
+    points1 = random_polygon(40, [randint(r1//2,28-r1//2), randint(r2//2,28-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [points1], (255))
     mask = np.asarray(mask)
     imgarray = np.where(mask>0,-1,imgarray)
     Y_test.append(imgarray)
-    yte = np.asarray(Image.fromarray(imgarray).resize((32,32)))
+    yte = np.asarray(Image.fromarray(imgarray).resize((28,28)))
     y_test.append(yte)
 
 X_train = np.array(X_train)
@@ -99,16 +92,16 @@ def load_data():
 
 def remask(idx):
     imgarray = X_train[idx,:,:,0]
-    mask = np.zeros((32,32),dtype=np.uint8)
+    mask = np.zeros((28,28),dtype=np.uint8)
     r1 = randint(3,16)
     r2 = randint(3,16)
-    points1 = random_polygon(40, [randint(r1//2,32-r1//2), randint(r2//2,32-r2//2)], [r1, r2])
+    points1 = random_polygon(40, [randint(r1//2,28-r1//2), randint(r2//2,28-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [points1], (255))
     mask = np.asarray(mask)
     imgarray = np.where(mask>0,-1,imgarray)
     global Y_train, y_train
     Y_train[idx] = np.expand_dims(imgarray, axis=2)
-    # ytr = np.asarray(Image.fromarray(imgarray).resize((32,32)))
+    # ytr = np.asarray(Image.fromarray(imgarray).resize((28,28)))
     ytr = imgarray
     y_train[idx] = np.expand_dims(ytr, axis=2)
 

@@ -10,11 +10,11 @@ import os
 
 class GAN():
     def __init__(self):
-        self.img_rows = 32
-        self.img_cols = 32
+        self.img_rows = 28
+        self.img_cols = 28
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.img_gen_shape = (32,32,1)
+        self.img_gen_shape = (28,28,1)
 
         optimizer = adam_v2.Adam(0.00002, 0.5)
 
@@ -74,23 +74,11 @@ class GAN():
         model.add(Conv2D(128,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
         model.add(Flatten())
-        model.add(Dense(16384))
+        model.add(Dense(14700))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
-        model.add(Reshape((2,2,4096)))
-        model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
-        model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(LeakyReLU(alpha=0.2))
+        model.add(Reshape((7,7,300)))
         model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
