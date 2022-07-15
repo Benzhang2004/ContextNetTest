@@ -63,6 +63,9 @@ class GAN():
         self.combined = Model([z,label, label_gen], validity)
         self.combined.compile(loss='binary_crossentropy', optimizer=adam_v2.Adam(0.0002, 0.5))
 
+        # Load the dataset
+        (_,_,_),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
+
 
     def build_generator(self):
 
@@ -143,9 +146,6 @@ class GAN():
 
 
     def train(self, epochs, batch_size=128, sample_interval=50):
-
-        # Load the dataset
-        (_,_,_),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
         ds.epo = self.epo
