@@ -20,8 +20,8 @@ X_test = []
 y_test = []
 
 (X_train, _), (X_test, _) = mnist.load_data()
-X_train = X_train / 127.5 - 1.
-X_test = X_test / 127.5 - 1.
+X_train = X_train / 255.
+X_test = X_test / 255.
 
 MAX_VAL = 180
 COLOR_table = []
