@@ -16,7 +16,8 @@ class GAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.img_gen_shape = (64,64,1)
 
-        optimizer = adam_v2.Adam(0.00002, 0.5)
+        optimizer1 = adam_v2.Adam(0.00002, 0.5)
+        optimizer2 = adam_v2.Adam(0.0002, 0.5)
 
         # Create Dirs
         if(not os.path.exists('models')):
@@ -32,7 +33,7 @@ class GAN():
         # Build the discriminator
         self.discriminator = self.build_discriminator()
         self.discriminator.compile(loss='binary_crossentropy',
-            optimizer=optimizer,
+            optimizer=optimizer1,
             metrics=['accuracy'])
 
         # Load the discriminator weights
@@ -41,6 +42,8 @@ class GAN():
 
         # Build the generator
         self.generator = self.build_generator()
+        self.generator.compile(loss='binary_crossentropy',
+            optimizer=optimizer2)
 
         # Load the generator weights
         if(os.path.exists('models/gen.h5')):
@@ -61,7 +64,7 @@ class GAN():
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
         self.combined = Model([z,label, label_gen], validity)
-        self.combined.compile(loss='binary_crossentropy', optimizer=adam_v2.Adam(0.0002, 0.5))
+        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer2)
 
         # Load the dataset
         (_,_,_),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
@@ -206,10 +209,11 @@ class GAN():
             noise = np.random.normal(0, 1, (batch_size,)+self.img_shape)
 
             # Train the generator (to have the discriminator label samples as valid)
-            g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=20, verbose=0)
+            c_loss = self.generator.fit([noise,labels], imgs, epochs=10, verbose=0)
+            g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=10, verbose=0)
             
             # Plot the progress
-            print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, g_loss.history['loss'][-1]))
+            print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, 0.5*(c_loss.history['loss'][-1]+g_loss.history['loss'][-1])))
 
             self.cur_iter = epoch
 
