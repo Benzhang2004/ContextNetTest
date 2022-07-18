@@ -259,6 +259,7 @@ class GAN():
         self.discriminator.save_weights('models/dis.h5')
         with open('models/epoch','w') as f:
             f.write(str(self.cur_iter))
+        self.discriminator.trainable = False
 
 
 if __name__ == '__main__':
