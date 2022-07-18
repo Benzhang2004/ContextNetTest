@@ -160,7 +160,7 @@ class GAN():
         ds.batch_size = batch_size
         ds.epochs = epochs
         ds.init_data()
-        (X_train,_,_),(_,_,_) = ds.load_data()
+        (X_train,_,_),(self.X_test,self.Y_test,self.y_test) = ds.load_data()
 
         noise = np.random.normal(0, 1, X_train.shape)
 
