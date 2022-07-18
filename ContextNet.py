@@ -17,7 +17,7 @@ class GAN():
         self.img_gen_shape = (64,64,1)
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
-        optimizer2 = adam_v2.Adam(0.0002, 0.5)
+        optimizer2 = adam_v2.Adam(0.002, 0.5)
 
         # Create Dirs
         if(not os.path.exists('models')):
@@ -125,16 +125,12 @@ class GAN():
         model = Sequential()
         
         model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
         model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
         model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
         model.add(LeakyReLU(alpha=0.2))
         model.add(Flatten())
         model.add(Dense(8192))
