@@ -170,8 +170,8 @@ class GAN():
 
         epoch = self.epo
         
-        self.generator.fit([X_train,noise],X_train,epochs=1000,batch_size=512)
-        self.cur_iter = 1000
+        self.generator.fit([X_train,noise],X_train,epochs=10,batch_size=512)
+        self.cur_iter = 10
         self.save_models()
 
             
