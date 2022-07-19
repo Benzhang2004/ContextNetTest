@@ -209,7 +209,7 @@ class GAN():
             # g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=10, verbose=0)
             
             # Plot the progress
-            print("C_loss: ", c_loss.history['loss'][-1])
+            print("epoch: ",epoch,"C_loss: ", c_loss.history['loss'][-1])
             # print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, 0.5*(c_loss.history['loss'][-1]+g_loss.history['loss'][-1])))
 
             self.cur_iter = epoch
