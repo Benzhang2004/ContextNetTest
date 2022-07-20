@@ -212,7 +212,7 @@ class GAN():
         # Shaped images
         tmp = np.zeros_like(label[0,:,:])
         tmp[24:40,24:40] = gen_img[0,:,:,0]
-        shaped_img = np.add(np.minimum(label[0,:,:],0),tmp)
+        shaped_img = np.add(np.maximum(label[0,:,:],0),tmp)
 
         fig, axs = plt.subplots(1, 4)
         axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')
