@@ -59,11 +59,11 @@ for (x, item) in enumerate(li):
     points1 = random_polygon(40, [randint(r1//2,64-r1//2), randint(r2//2,64-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [np.array([[24,24],[40,24],[40,40],[24,40]])], (255))
     mask = np.asarray(mask)
-    X_train.append(imgarray[24:41,24:41])
+    X_train.append(imgarray[24:40,24:40])
     # Image.fromarray(imgarray[24:41,24:41]*255).show()
     imgarray = np.where(mask>0,-1,imgarray)
     Y_train.append(imgarray)
-    ytr = np.asarray(Image.fromarray(imgarray).resize((8,8)))
+    ytr = np.asarray(Image.fromarray(imgarray).resize((16,16)))
     y_train.append(ytr)
 
 
@@ -83,11 +83,11 @@ for (x, item) in enumerate(li):
     points1 = random_polygon(40, [randint(r1//2,64-r1//2), randint(r2//2,64-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [np.array([[24,24],[40,24],[40,40],[24,40]])], (255))
     mask = np.asarray(mask)
-    X_test.append(imgarray[24:41,24:41])
+    X_test.append(imgarray[24:40,24:40])
     # Image.fromarray(imgarray[24:41,24:41]).show()
     imgarray = np.where(mask>0,-1,imgarray)
     Y_test.append(imgarray)
-    yte = np.asarray(Image.fromarray(imgarray).resize((8,8)))
+    yte = np.asarray(Image.fromarray(imgarray).resize((16,16)))
     y_test.append(yte)
 
 X_train = np.array(X_train)

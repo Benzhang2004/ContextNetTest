@@ -14,7 +14,7 @@ class GAN():
         self.img_cols = 64
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.img_gen_shape = (8,8,1)
+        self.img_gen_shape = (16,16,1)
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
         optimizer2 = adam_v2.Adam(0.002, 0.5)
@@ -86,6 +86,9 @@ class GAN():
         model.add(BatchNormalization())
         model.add(ReLU())
         model.add(Reshape((4,4,1024)))
+        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization())
+        model.add(ReLU())
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
         model.add(ReLU())
@@ -106,8 +109,6 @@ class GAN():
 
         model = Sequential()
         
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
         model.add(Conv2D(256,(4,4),(2,2),padding='same'))
         model.add(ReLU())
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
@@ -210,7 +211,7 @@ class GAN():
 
         # Shaped images
         tmp = np.zeros_like(label[0,:,:])
-        tmp[24:41,24:41] = gen_img[0,:,:,0]
+        tmp[24:40,24:40] = gen_img[0,:,:,0]
         shaped_img = np.add(np.minimum(label[0,:,:],0),tmp)
 
         fig, axs = plt.subplots(1, 4)
