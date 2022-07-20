@@ -185,7 +185,9 @@ class GAN():
             
             # Plot the progress
             print ("[C loss: ", c_loss.history['loss'][-1],end='] ')
-            print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, g_loss.history['loss'][-1]))
+            # print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, g_loss.history['loss'][-1]))
+            print ("%d [D loss: %f, acc.: %.2f%%]" % (epoch, d_loss, 100*d_loss_acc))
+
 
             self.cur_iter = epoch
 
@@ -211,8 +213,7 @@ class GAN():
         gen_img = np.minimum(np.maximum(gen_img,0),1)
 
         # Shaped images
-        tmp = np.zeros_like(label[0,:,:])
-        tmp[24:40,24:40] = gen_img[0,:,:,0]
+        tmp = np.pad(gen_img[0,:,:,0],((24,24),(24,24)))
         shaped_img = np.add(np.maximum(label[0,:,:],0),tmp)
 
         fig, axs = plt.subplots(1, 4)
