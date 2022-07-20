@@ -52,16 +52,18 @@ for (x, item) in enumerate(li):
     im=im.convert('L')
     im=im.point(COLOR_table,'L')
     imgarray = np.asarray(im)
-    X_train.append(np.asarray(im.resize((64,64))))
+    # X_train.append(np.asarray(im.resize((64,64))))
     mask = np.zeros((64,64),dtype=np.uint8)
     r1 = randint(3,16)
     r2 = randint(3,16)
     points1 = random_polygon(40, [randint(r1//2,64-r1//2), randint(r2//2,64-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [np.array([[24,24],[40,24],[40,40],[24,40]])], (255))
     mask = np.asarray(mask)
+    X_train.append(imgarray[24:41,24:41])
+    # Image.fromarray(imgarray[24:41,24:41]*255).show()
     imgarray = np.where(mask>0,-1,imgarray)
     Y_train.append(imgarray)
-    ytr = np.asarray(Image.fromarray(imgarray).resize((64,64)))
+    ytr = np.asarray(Image.fromarray(imgarray).resize((8,8)))
     y_train.append(ytr)
 
 
@@ -74,16 +76,18 @@ for (x, item) in enumerate(li):
     im=im.convert('L')
     im=im.point(COLOR_table,'L')
     imgarray = np.asarray(im)
-    X_test.append(np.asarray(im.resize((64,64))))
+    # X_test.append(np.asarray(im.resize((64,64))))
     mask = np.zeros((64,64),dtype=np.uint8)
     r1 = randint(3,16)
     r2 = randint(3,16)
     points1 = random_polygon(40, [randint(r1//2,64-r1//2), randint(r2//2,64-r2//2)], [r1, r2])
     mask = cv2.fillPoly(mask, [np.array([[24,24],[40,24],[40,40],[24,40]])], (255))
     mask = np.asarray(mask)
+    X_test.append(imgarray[24:41,24:41])
+    # Image.fromarray(imgarray[24:41,24:41]).show()
     imgarray = np.where(mask>0,-1,imgarray)
     Y_test.append(imgarray)
-    yte = np.asarray(Image.fromarray(imgarray).resize((64,64)))
+    yte = np.asarray(Image.fromarray(imgarray).resize((8,8)))
     y_test.append(yte)
 
 X_train = np.array(X_train)
@@ -138,7 +142,8 @@ def _gen_Xtrain():
         for j in range(batch_size):
             Xx = X_train[idxs[genX_cur]]
             if(genX_cur<min(genY_cur,geny_cur)):
-                remask(idxs[genX_cur])
+                pass
+                # remask(idxs[genX_cur])
             genX_cur+=1
             yield Xx
             gc()
@@ -149,7 +154,8 @@ def _gen_Ytrain():
         for j in range(batch_size):
             Yx = Y_train[idxs[genY_cur]]
             if(genY_cur<min(genX_cur,geny_cur)):
-                remask(idxs[genY_cur])
+                pass
+                # remask(idxs[genY_cur])
             genY_cur+=1
             yield Yx
             gc()
@@ -160,7 +166,8 @@ def _gen_ytrain():
         for j in range(batch_size):
             y = y_train[idxs[geny_cur]]
             if(geny_cur<min(genY_cur,genX_cur)):
-                remask(idxs[geny_cur])
+                pass
+                # remask(idxs[geny_cur])
             geny_cur+=1
             yield y
             gc()
