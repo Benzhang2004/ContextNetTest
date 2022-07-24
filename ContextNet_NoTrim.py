@@ -181,7 +181,6 @@ class GAN():
             # Train the generator (to have the discriminator label samples as valid)
             c_loss = self.generator.fit([noise,labels], imgs, epochs=5, verbose=0)
             # g_loss = self.combined.fit([noise,labels], valid, epochs=5, verbose=0)
-            g_loss = 0
             
             # Plot the progress
             print ("[C loss: ", c_loss.history['loss'][-1],end='] ')

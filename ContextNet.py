@@ -14,7 +14,7 @@ class GAN():
         self.img_cols = 64
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.img_gen_shape = (64,64,1)
+        self.img_gen_shape = (16,16,1)
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
         optimizer2 = adam_v2.Adam(0.002, 0.5)
@@ -52,18 +52,17 @@ class GAN():
         # The generator takes noise as input and generates imgs
         z = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
-        label_gen = Input(shape=self.img_gen_shape)
         img = self.generator([z,label])
 
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
 
         # The discriminator takes generated images as input and determines validity
-        validity = self.discriminator([img,label_gen])
+        validity = self.discriminator(img)
 
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model([z,label, label_gen], validity)
+        self.combined = Model([z,label], validity)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer2)
 
         # Load the dataset
@@ -86,27 +85,13 @@ class GAN():
         model.add(Dense(16384))
         model.add(BatchNormalization())
         model.add(ReLU())
-        model.add(Dense(8000))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Dense(8000))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Dense(16384))
-        model.add(BatchNormalization())
-        model.add(ReLU())
         model.add(Reshape((4,4,1024)))
-        model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
+        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
         model.add(ReLU())
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
+        model.add(ReLU())
         model.add(Activation('sigmoid'))
 
         noise = Input(shape=self.img_shape)
@@ -124,32 +109,21 @@ class GAN():
 
         model = Sequential()
         
-        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
         model.add(Conv2D(256,(4,4),(2,2),padding='same'))
         model.add(ReLU())
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
         model.add(ReLU())
         model.add(Flatten())
-        model.add(Dense(8192))
+        model.add(Dense(16384))
         model.add(BatchNormalization())
         model.add(ReLU())
         model.add(Dense(1, activation='sigmoid'))
 
         img = Input(shape=self.img_gen_shape)
-        label = Input(shape=self.img_gen_shape)
-        
-        tmp = merge.minimum([label,np.zeros((1,)+self.img_gen_shape)])
-        tmp = merge.multiply([tmp,img])
-        tmp = merge.multiply([tmp,np.multiply(np.ones((1,)+self.img_gen_shape),-1)])
-        tmp2 = merge.maximum([label,np.zeros((1,)+self.img_gen_shape)])
-        comp = merge.add([tmp,tmp2])
 
-        validity = model(comp)
+        validity = model(img)
     
-        return Model([img, label], validity)
+        return Model(img, validity)
 
 
 
@@ -193,8 +167,8 @@ class GAN():
             gen_imgs = self.generator.predict([noise,labels])
 
             # Train the discriminator
-            d_loss_real = self.discriminator.fit([imgs,labels_gen], valid, epochs=4, verbose=0)
-            d_loss_fake = self.discriminator.fit([gen_imgs,labels_gen], fake, epochs=4, verbose=0)
+            d_loss_real = self.discriminator.fit([imgs], valid, epochs=4, verbose=0)
+            d_loss_fake = self.discriminator.fit([gen_imgs], fake, epochs=4, verbose=0)
             d_loss = 0.5 * (d_loss_real.history['loss'][-1] + d_loss_fake.history['loss'][-1])
             d_loss_acc = 0.5 * (d_loss_real.history['accuracy'][-1] + d_loss_fake.history['accuracy'][-1])
 
@@ -205,12 +179,14 @@ class GAN():
             noise = np.random.normal(0, 1, (batch_size,)+self.img_shape)
 
             # Train the generator (to have the discriminator label samples as valid)
-            # c_loss = self.generator.fit([noise,imgs], imgs, epochs=10, verbose=0)
-            g_loss = self.combined.fit([noise,labels,labels_gen], valid, epochs=10, verbose=0)
+            c_loss = self.generator.fit([noise,labels], imgs, epochs=5, verbose=0)
+            # g_loss = self.combined.fit([noise,labels], valid, epochs=5, verbose=0)
             
             # Plot the progress
-            # print("epoch: ",epoch,"C_loss: ", c_loss.history['loss'][-1])
-            print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, g_loss.history['loss'][-1]))
+            print ("[C loss: ", c_loss.history['loss'][-1],end='] ')
+            # print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss, 100*d_loss_acc, g_loss.history['loss'][-1]))
+            print ("%d [D loss: %f, acc.: %.2f%%]" % (epoch, d_loss, 100*d_loss_acc))
+
 
             self.cur_iter = epoch
 
@@ -233,14 +209,11 @@ class GAN():
         label_gen = self.y_test[idx]
 
         # Rescale images 0 - 1
-        gen_img = np.maximum(gen_img,0)
+        gen_img = np.minimum(np.maximum(gen_img,0),1)
 
         # Shaped images
-        tmp = np.minimum(label_gen[0,:,:],0)
-        tmp = np.multiply(tmp,gen_img[0,:,:,0])
-        tmp = np.multiply(tmp,-1)
-        tmp2 = np.maximum(label_gen[0,:,:],0)
-        shaped_img = np.add(tmp,tmp2)
+        tmp = np.pad(gen_img[0,:,:,0],((24,24),(24,24)))
+        shaped_img = np.add(np.maximum(label[0,:,:],0),tmp)
 
         fig, axs = plt.subplots(1, 4)
         axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')
