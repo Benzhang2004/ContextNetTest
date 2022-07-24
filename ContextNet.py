@@ -18,6 +18,7 @@ class GAN():
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
         optimizer2 = adam_v2.Adam(0.02)
+        optimizer3 = adam_v2.Adam(0.02)
 
         # Create Dirs
         if(not os.path.exists('models')):
@@ -63,7 +64,7 @@ class GAN():
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
         self.combined = Model([z,label], validity)
-        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer2)
+        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer3)
 
         # Load the dataset
         (_,_,_),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
