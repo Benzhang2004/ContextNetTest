@@ -17,7 +17,7 @@ class GAN():
         self.img_gen_shape = (16,16,1)
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
-        optimizer2 = adam_v2.Adam(0.1, 0.5)
+        optimizer2 = adam_v2.Adam(0.2, 0.5)
         optimizer3 = adam_v2.Adam(0.02, 0.5)
 
         # Create Dirs
@@ -84,16 +84,11 @@ class GAN():
         model.add(ReLU())
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
         model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
         model.add(Flatten())
         model.add(Dense(16384))
         model.add(BatchNormalization())
         model.add(ReLU())
-        model.add(Reshape((1,1,16384)))
-        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
+        model.add(Reshape((2,2,4096)))
         model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
         model.add(ReLU())
