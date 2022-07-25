@@ -17,7 +17,7 @@ class GAN():
         self.img_gen_shape = (16,16,1)
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
-        optimizer2 = adam_v2.Adam(0.2, 0.5)
+        optimizer2 = adam_v2.Adam(0.1, 0.5)
         optimizer3 = adam_v2.Adam(0.02, 0.5)
 
         # Create Dirs
