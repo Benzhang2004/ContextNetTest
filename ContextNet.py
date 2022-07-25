@@ -83,7 +83,7 @@ class GAN():
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
         model.add(ReLU())
         model.add(Flatten())
-        model.add(Dense(16384))
+        model.add(Dense(20480))
         model.add(BatchNormalization())
         model.add(ReLU())
         model.add(Reshape((4,4,1024)))
