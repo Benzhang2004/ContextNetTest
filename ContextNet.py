@@ -18,7 +18,7 @@ class GAN():
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
         optimizer2 = adam_v2.Adam(0.02)
-        optimizer3 = adam_v2.Adam(0.2)
+        optimizer3 = adam_v2.Adam(0.02)
 
         # Create Dirs
         if(not os.path.exists('models')):
