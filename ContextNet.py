@@ -1,4 +1,3 @@
-from unicodedata import name
 from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
@@ -106,7 +105,7 @@ class GAN():
         model_input = merge.multiply([noise, label])
 
         sht = model1(model_input)
-        res = merge.add(model2(sht),sht)
+        res = merge.add([model2(sht),sht])
         img = model3(res)
         
         return Model([noise,label], img)
