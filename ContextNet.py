@@ -82,8 +82,6 @@ class GAN():
         model.add(ReLU())
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
         model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(1,1),padding='same'))
-        model.add(ReLU())
         model.add(Flatten())
         model.add(Dense(65536))
         model.add(BatchNormalization())
@@ -242,7 +240,7 @@ class GAN():
 if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32510)])
+    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=11264)])
 
     gan = GAN()
     gan. train(epochs=100000, batch_size=512, sample_interval=50)
