@@ -1,3 +1,4 @@
+from unicodedata import name
 from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
@@ -72,35 +73,41 @@ class GAN():
 
     def build_generator(self):
 
-        model = Sequential()
+        model1 = Sequential()
+        model2 = Sequential()
+        model3 = Sequential()
 
-        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Flatten())
-        model.add(Dense(16384))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Reshape((4,4,1024)))
-        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Activation('sigmoid'))
+        model1.add(Conv2D(64,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(128,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(256,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+
+        model2.add(Conv2D(512,(4,4),(2,2),padding='same'))
+        model2.add(ReLU())
+        model2.add(Flatten())
+        model2.add(Dense(16384))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Reshape((4,4,1024)))
+        model2.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+
+        model3.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
+        model3.add(BatchNormalization())
+        model3.add(ReLU())
+        model3.add(Activation('sigmoid'))
 
         noise = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
 
         model_input = merge.multiply([noise, label])
 
-        img = model(model_input)
+        sht = model1(model_input)
+        res = merge.add(model2(sht),sht)
+        img = model3(res)
         
         return Model([noise,label], img)
         
