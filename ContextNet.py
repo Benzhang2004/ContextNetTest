@@ -72,35 +72,39 @@ class GAN():
 
     def build_generator(self):
 
-        model = Sequential()
+        model1 = Sequential()
+        model2 = Sequential()
 
-        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Flatten())
-        model.add(Dense(65536))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Reshape((4,4,4096)))
-        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Activation('sigmoid'))
+        model1.add(Conv2D(64,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(128,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(256,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        
+        model2.add(Conv2D(512,(4,4),(2,2),padding='same'))
+        model2.add(ReLU())
+        model2.add(Flatten())
+        model2.add(Dense(16384))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Reshape((4,4,1024)))
+        model2.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Activation('sigmoid'))
 
         noise = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
 
         model_input = merge.multiply([noise, label])
 
-        img = model(model_input)
+        shrc = model1(model_input)
+        att = (Dense(256,activation='relu')(shrc))
+        img = model2(merge.multiply([att,shrc]))
         
         return Model([noise,label], img)
         
@@ -240,7 +244,7 @@ class GAN():
 if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32510)])
+    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=11264)])
 
     gan = GAN()
-    gan. train(epochs=100000, batch_size=1024, sample_interval=50)
+    gan. train(epochs=100000, batch_size=512, sample_interval=50)
