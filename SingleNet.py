@@ -51,9 +51,8 @@ class GAN():
             self.generator.load_weights('models/gen.h5')
 
         # The generator takes noise as input and generates imgs
-        z = Input(shape=self.img_shape)
         label = Input(shape=self.img_shape)
-        img = self.generator([z,label])
+        img = self.generator(label)
 
         # For the combined model we will only train the generator
         self.discriminator.trainable = False
@@ -63,7 +62,7 @@ class GAN():
 
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model([z,label], validity)
+        self.combined = Model(label, validity)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer3)
 
         # Load the dataset
@@ -135,7 +134,7 @@ class GAN():
 
         epoch = self.epo
         for i in range(epochs/sample_interval):
-            self.generator.fit(self.Y_train,self.X_train, epochs=sample_interval, verbose=0)
+            self.generator.fit(self.Y_train,self.X_train, batch_size, epochs=sample_interval)
             epoch+=sample_interval
             self.cur_iter = epoch
             self.sample_images(epoch)
@@ -184,4 +183,4 @@ if __name__ == '__main__':
     tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32510)])
 
     gan = GAN()
-    gan. train(epochs=100000, batch_size=256, sample_interval=50)
+    gan. train(epochs=100000, batch_size=512, sample_interval=50)
