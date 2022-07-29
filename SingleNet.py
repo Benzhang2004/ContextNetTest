@@ -133,7 +133,7 @@ class GAN():
         ds.init_data()
 
         epoch = self.epo
-        for i in range(epochs/sample_interval):
+        for i in range(int(epochs/sample_interval)):
             self.generator.fit(self.Y_train,self.X_train, batch_size, epochs=sample_interval)
             epoch+=sample_interval
             self.cur_iter = epoch
