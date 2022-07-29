@@ -17,7 +17,7 @@ class GAN():
         self.img_gen_shape = (16,16,1)
 
         optimizer1 = adam_v2.Adam(0.00002, 0.5)
-        optimizer2 = adam_v2.Adam(0.05, 0.5)
+        optimizer2 = adam_v2.Adam(0.1, 0.5)
         optimizer3 = adam_v2.Adam(0.01, 0.5)
 
         # Create Dirs
@@ -146,7 +146,7 @@ class GAN():
         idx = np.random.randint(0, self.X_test.shape[0], 1)
         noise = np.random.normal(0, 1, (1,)+self.img_shape)
         label = self.Y_test[idx]
-        gen_img = self.generator.predict([noise,label])
+        gen_img = self.generator.predict(label)
         label_gen = self.y_test[idx]
 
         # Rescale images 0 - 1
@@ -183,4 +183,4 @@ if __name__ == '__main__':
     tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32510)])
 
     gan = GAN()
-    gan. train(epochs=100000, batch_size=512, sample_interval=50)
+    gan. train(epochs=100000, batch_size=1024, sample_interval=10)
