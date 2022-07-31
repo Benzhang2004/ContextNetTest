@@ -81,7 +81,7 @@ class GAN():
         model.add(ReLU())
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
         model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(1,1),padding='same'))
+        model.add(Conv2D(1024,(4,4),(1,1),padding='same'))
         model.add(ReLU())
         model.add(Flatten())
         model.add(Dense(16384))
