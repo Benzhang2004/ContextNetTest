@@ -1,11 +1,10 @@
 import ds
 import tensorflow as tf
 import numpy as np
-from PIL import Image
-import matplotlib.pyplot as plt
 
 (X_train,Y_train,y_train),(X_test,Y_test,y_test) = ds.load_data()
 y_train = np.multiply(np.where(Y_train < 0, 1, 0),X_train)
+ds.init_data()
 
 def load_data():
     return ds.load_data()
@@ -15,7 +14,7 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
         self.batch_size = batch_size
 
     def __len__(self):
-        return (ds.X_train.shape[0])/self.batch_size
+        return int((ds.X_train.shape[0])/self.batch_size)
 
     def __getitem__(self, idx):
         batch_Y = Y_train[idx * self.batch_size:(idx + 1) * self.batch_size]
