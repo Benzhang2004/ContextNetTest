@@ -74,15 +74,15 @@ class GAN():
         model = Sequential()
 
         model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
+        model.add(ReLU()) # 32
         model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
+        model.add(ReLU()) # 16
         model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
+        model.add(ReLU()) # 8
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
+        model.add(ReLU()) # 4
         model.add(Conv2D(1024,(4,4),(1,1),padding='same'))
-        model.add(ReLU())
+        model.add(ReLU()) # 4
         model.add(Flatten())
         model.add(Dense(16384))
         model.add(BatchNormalization())
@@ -90,10 +90,16 @@ class GAN():
         model.add(Reshape((4,4,1024)))
         model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
-        model.add(ReLU())
+        model.add(ReLU()) # 8
+        model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization())
+        model.add(ReLU()) # 16
+        model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization())
+        model.add(ReLU()) # 32
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization())
-        model.add(ReLU())
+        model.add(ReLU()) # 64
         model.add(Activation('sigmoid'))
 
         label = Input(shape=self.img_shape)
@@ -150,8 +156,7 @@ class GAN():
         gen_img = np.minimum(np.maximum(gen_img,0),1)
 
         # Shaped images
-        tmp = np.pad(gen_img[0,:,:,0],((24,24),(24,24)))
-        shaped_img = np.add(np.maximum(label[0,:,:],0),tmp)
+        shaped_img = np.add(np.multiply(np.where(label[0,:,:] < 0, 1, 0),gen_img[0,:,:,0]),np.maximum(label[0,:,:],0))
 
         fig, axs = plt.subplots(1, 4)
         axs[0].imshow(self.X_test[idx][0,:,:], cmap='gray')

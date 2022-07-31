@@ -7,15 +7,6 @@ import matplotlib.pyplot as plt
 (X_train,Y_train,y_train),(X_test,Y_test,y_test) = ds.load_data()
 y_train = np.multiply(np.where(Y_train < 0, 1, 0),X_train)
 
-fig, axs = plt.subplots(1, 4)
-axs[0].imshow(y_train[0], cmap='gray')
-axs[1].imshow(X_train[0], cmap='gray')
-axs[2].imshow(Y_train[0], cmap='gray')
-axs[0].axis('off')
-axs[1].axis('off')
-axs[2].axis('off')
-
-
 def load_data():
     return ds.load_data()
 
