@@ -102,10 +102,7 @@ class GAN():
         model.add(Conv2DTranspose(512,(4,4),(4,4),padding='same'))
         model.add(BatchNormalization())
         model.add(ReLU()) # 16
-        model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU()) # 32
-        model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
+        model.add(Conv2DTranspose(1,(4,4),(4,4),padding='same'))
         model.add(BatchNormalization())
         model.add(ReLU()) # 64
         model.add(Activation('sigmoid'))
