@@ -99,20 +99,13 @@ class GAN():
         model.add(BatchNormalization())
         model.add(ReLU())
         model.add(Reshape((4,4,1024)))
-        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
-        model.add(Dropout(0.5))
-        model.add(BatchNormalization())
-        model.add(ReLU()) # 8
-        model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
-        model.add(Dropout(0.5))
+        model.add(Conv2DTranspose(512,(4,4),(4,4),padding='same'))
         model.add(BatchNormalization())
         model.add(ReLU()) # 16
         model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
-        model.add(Dropout(0.5))
         model.add(BatchNormalization())
         model.add(ReLU()) # 32
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
-        model.add(Dropout(0.5))
         model.add(BatchNormalization())
         model.add(ReLU()) # 64
         model.add(Activation('sigmoid'))
