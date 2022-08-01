@@ -39,7 +39,7 @@ class SingleNetPRDS(tf.keras.utils.Sequence):
 
         batch_Y = [Y_train[self.seq]]
         batch_y = [y_train[self.seq]]
-        for i in range(self.batch_size):
+        for i in range(self.batch_size-1):
             ds.remask(self.seq)
             batch_Y.append(ds.Y_train[self.seq,:,:,0])
             batch_y.append(np.multiply(np.where(ds.Y_train[self.seq,:,:,0] < 0, 1, 0),X_train[self.seq]))
