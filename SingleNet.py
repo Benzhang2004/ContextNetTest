@@ -1,5 +1,5 @@
 from unicodedata import name
-from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D
+from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D, Dropout
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
 import tensorflow as tf
@@ -77,11 +77,11 @@ class GAN():
         model.add(Conv2D(96,11,4,padding='valid')) # conv1
         model.add(MaxPool2D(3,2,padding='valid')) # maxpool1
         model.add(Conv2D(256,5,1,padding='same')) # conv2
-        model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
+        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
         model.add(Conv2D(384,3,1,padding='same')) # conv3
         model.add(Conv2D(384,3,1,padding='same')) # conv4
         model.add(Conv2D(256,3,1,padding='same')) # conv5
-        model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
+        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
 
 
         # model.add(Conv2D(64,(4,4),(2,2),padding='same'))
@@ -100,15 +100,19 @@ class GAN():
         model.add(ReLU())
         model.add(Reshape((4,4,1024)))
         model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
+        model.add(Dropout(0.5))
         model.add(BatchNormalization())
         model.add(ReLU()) # 8
         model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
+        model.add(Dropout(0.5))
         model.add(BatchNormalization())
         model.add(ReLU()) # 16
         model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
+        model.add(Dropout(0.5))
         model.add(BatchNormalization())
         model.add(ReLU()) # 32
         model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
+        model.add(Dropout(0.5))
         model.add(BatchNormalization())
         model.add(ReLU()) # 64
         model.add(Activation('sigmoid'))
