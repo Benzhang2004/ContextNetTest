@@ -1,4 +1,5 @@
-from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU
+from unicodedata import name
+from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
 import tensorflow as tf
@@ -73,16 +74,26 @@ class GAN():
 
         model = Sequential()
 
-        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(ReLU()) # 32
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU()) # 16
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(ReLU()) # 8
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU()) # 4
-        model.add(Conv2D(1024,(4,4),(1,1),padding='same'))
-        model.add(ReLU()) # 4
+        model.add(Conv2D(96,11,4,padding='valid')) # conv1
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool1
+        model.add(Conv2D(256,5,1,padding='same')) # conv2
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
+        model.add(Conv2D(384,3,1,padding='same')) # conv3
+        model.add(Conv2D(384,3,1,padding='same')) # conv4
+        model.add(Conv2D(256,3,1,padding='same')) # conv5
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
+
+
+        # model.add(Conv2D(64,(4,4),(2,2),padding='same'))
+        # model.add(ReLU()) # 32
+        # model.add(Conv2D(128,(4,4),(2,2),padding='same'))
+        # model.add(ReLU()) # 16
+        # model.add(Conv2D(256,(4,4),(2,2),padding='same'))
+        # model.add(ReLU()) # 8
+        # model.add(Conv2D(512,(4,4),(2,2),padding='same'))
+        # model.add(ReLU()) # 4
+        # model.add(Conv2D(1024,(4,4),(1,1),padding='same'))
+        # model.add(ReLU()) # 4
         model.add(Flatten())
         model.add(Dense(16384))
         model.add(BatchNormalization())
