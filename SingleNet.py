@@ -77,11 +77,11 @@ class GAN():
         model.add(Conv2D(96,11,4,padding='valid')) # conv1
         model.add(MaxPool2D(3,2,padding='valid')) # maxpool1
         model.add(Conv2D(256,5,1,padding='same')) # conv2
-        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
         model.add(Conv2D(384,3,1,padding='same')) # conv3
         model.add(Conv2D(384,3,1,padding='same')) # conv4
         model.add(Conv2D(256,3,1,padding='same')) # conv5
-        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
 
 
         # model.add(Conv2D(64,(4,4),(2,2),padding='same'))
