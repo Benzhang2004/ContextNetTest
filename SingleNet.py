@@ -170,7 +170,7 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
-        Yytrain = ds.SingleNetTrDS(batch_size)
+        Yytrain = ds.SingleNetPRDS(batch_size)
 
         epoch = self.epo
         for i in range(int(epochs/sample_interval)):
