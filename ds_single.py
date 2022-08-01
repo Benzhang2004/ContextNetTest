@@ -21,5 +21,6 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
         batch_y = y_train[idx * self.batch_size:(idx + 1) * self.batch_size]
         for i in range(idx * self.batch_size, (idx + 1) * self.batch_size):
             ds.remask(i)
+            Y_train[i] = ds.Y_train[i]
             y_train[i] = np.multiply(np.where(Y_train[i] < 0, 1, 0),X_train[i])
         return batch_Y, batch_y
