@@ -113,12 +113,12 @@ class GAN():
         model1.add(Conv2D(128,(4,4),(2,2),padding='same'))
         model1.add(Conv2D(256,(4,4),(2,2),padding='same'))
         model1.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model1.add(Conv2D(1024,(4,4),(1,1),padding='same'))
+        model1.add(Conv2D(512,(4,4),(1,1),padding='same'))
         model1.add(Flatten())
-        model2.add(Dense(16384))
+        model2.add(Dense(9216))
         model2.add(BatchNormalization())
-        model2.add(Reshape((4,4,1024)))
-        model2.add(Conv2DTranspose(512,(4,4),(4,4),padding='same'))
+        model2.add(Reshape((4,4,576)))
+        model2.add(Conv2DTranspose(256,(4,4),(4,4),padding='same'))
         model2.add(BatchNormalization())
         model2.add(Conv2DTranspose(1,(4,4),(4,4),padding='same'))
         model2.add(BatchNormalization())
@@ -127,7 +127,7 @@ class GAN():
         label = Input(shape=self.img_shape)
 
         res = model1(label)
-        img = model2(merge.multiply([res,Dense(16384)(Flatten()(label))]))
+        img = model2(merge.multiply([res,Dense(9216)(Flatten()(label))]))
         
         return Model(label, img)
         
@@ -205,7 +205,7 @@ class GAN():
 if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32510)])
+    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=11264)])
 
     gan = GAN()
     gan. train(epochs=100000, batch_size=512, sample_interval=10)
