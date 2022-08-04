@@ -87,7 +87,7 @@ class GAN():
         model1.add(Conv2D(128,(4,4),(2,2),padding='same'))
         model1.add(Conv2D(256,(4,4),(2,2),padding='same'))
         model1.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model1.add(Conv2D(512,(4,4),(1,1),padding='same'))
+        model1.add(Conv2D(576,(4,4),(1,1),padding='same'))
         model1.add(Flatten())
         model2.add(Dense(9216))
         model2.add(BatchNormalization())
