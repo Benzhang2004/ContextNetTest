@@ -135,7 +135,7 @@ class GAN():
         label = Input(shape=self.img_shape)
 
         res = model1(label)
-        img = model2(merge.multiply([res,Dense(16384)(Flatten(label))]))
+        img = model2(merge.multiply([res,Dense(16384)(Flatten()(label))]))
         
         return Model(label, img)
         
