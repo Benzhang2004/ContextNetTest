@@ -112,6 +112,8 @@ class GAN():
         model.add(ReLU())
         model.add(Conv2D(128,(4,4),(2,2),padding='same'))
         model.add(ReLU())
+        model.add(Conv2D(256,(4,4),(1,1),padding='same'))
+        model.add(ReLU())
         model.add(Conv2D(256,(4,4),(2,2),padding='same'))
         model.add(ReLU())
         model.add(Conv2D(512,(4,4),(2,2),padding='same'))
