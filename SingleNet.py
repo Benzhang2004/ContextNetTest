@@ -72,7 +72,8 @@ class GAN():
 
     def build_generator(self):
 
-        model = Sequential()
+        model1 = Sequential()
+        model2 = Sequential()
 
         # model.add(Conv2D(96,11,4,padding='valid')) # conv1
         # model.add(MaxPool2D(3,2,padding='valid')) # maxpool1
@@ -108,34 +109,33 @@ class GAN():
         # model.add(Activation('sigmoid'))
 
 
-        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(256,(4,4),(1,1),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(1024,(4,4),(1,1),padding='same'))
-        model.add(ReLU())
-        model.add(Flatten())
-        model.add(Dense(16384))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Reshape((4,4,1024)))
-        model.add(Conv2DTranspose(512,(4,4),(4,4),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Conv2DTranspose(1,(4,4),(4,4),padding='same'))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Activation('sigmoid'))
+        model1.add(Conv2D(64,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(128,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(256,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(512,(4,4),(2,2),padding='same'))
+        model1.add(ReLU())
+        model1.add(Conv2D(1024,(4,4),(1,1),padding='same'))
+        model1.add(ReLU())
+        model1.add(Flatten())
+        model2.add(Dense(16384))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Reshape((4,4,1024)))
+        model2.add(Conv2DTranspose(512,(4,4),(4,4),padding='same'))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Conv2DTranspose(1,(4,4),(4,4),padding='same'))
+        model2.add(BatchNormalization())
+        model2.add(ReLU())
+        model2.add(Activation('sigmoid'))
 
         label = Input(shape=self.img_shape)
 
-        img = model(label)
+        res = model1(label)
+        img = model2(merge.multiply([res,Dense(16384)(Flatten(label))]))
         
         return Model(label, img)
         
