@@ -17,9 +17,7 @@ class GAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.img_gen_shape = (64,64,1)
 
-        optimizer1 = adam_v2.Adam(0.00002, 0.5)
-        optimizer2 = adam_v2.Adam(0.05, 0.5)
-        optimizer3 = adam_v2.Adam(0.01, 0.5)
+        optimizer = adam_v2.Adam(0.05, 0.5)
 
         # Create Dirs
         if(not os.path.exists('models')):
@@ -32,39 +30,15 @@ class GAN():
             with open('models/epoch','r') as f:
                 self.epo = int(f.read())
 
-        # Build the discriminator
-        self.discriminator = self.build_discriminator()
-        self.discriminator.compile(loss='binary_crossentropy',
-            optimizer=optimizer1,
-            metrics=['accuracy'])
-
-        # Load the discriminator weights
-        if(os.path.exists('models/dis.h5')):
-            self.discriminator.load_weights('models/dis.h5')
-
         # Build the generator
         self.generator = self.build_generator()
         self.generator.compile(loss='binary_crossentropy',
-            optimizer=optimizer2)
+            optimizer=optimizer)
 
         # Load the generator weights
         if(os.path.exists('models/gen.h5')):
             self.generator.load_weights('models/gen.h5')
 
-        # The generator takes noise as input and generates imgs
-        label = Input(shape=self.img_shape)
-        img = self.generator(label)
-
-        # For the combined model we will only train the generator
-        self.discriminator.trainable = False
-
-        # The discriminator takes generated images as input and determines validity
-        validity = self.discriminator(img)
-
-        # The combined model  (stacked generator and discriminator)
-        # Trains the generator to fool the discriminator
-        self.combined = Model(label, validity)
-        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer3)
 
         # Load the dataset
         (self.X_train,self.Y_train,self.y_train),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
@@ -130,29 +104,6 @@ class GAN():
         img = model2(merge.multiply([res,Dense(9216)(Flatten()(label))]))
         
         return Model(label, img)
-        
-        
-
-    def build_discriminator(self):
-
-        model = Sequential()
-        
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(ReLU())
-        model.add(Flatten())
-        model.add(Dense(16384))
-        model.add(BatchNormalization())
-        model.add(ReLU())
-        model.add(Dense(1, activation='sigmoid'))
-
-        img = Input(shape=self.img_gen_shape)
-
-        validity = model(img)
-    
-        return Model(img, validity)
-
 
 
     def train(self, epochs, batch_size=128, sample_interval=50):
@@ -195,11 +146,8 @@ class GAN():
 
     def save_models(self):
         self.generator.save_weights('models/gen.h5')
-        self.discriminator.trainable = True
-        self.discriminator.save_weights('models/dis.h5')
         with open('models/epoch','w') as f:
             f.write(str(self.cur_iter))
-        self.discriminator.trainable = False
 
 
 if __name__ == '__main__':
