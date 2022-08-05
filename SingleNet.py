@@ -88,9 +88,9 @@ class GAN():
         # model.add(Conv2D(512,(4,4),(2,2),padding='same'))
         # model.add(Conv2D(512,(4,4),(1,1),padding='same'))
         model.add(Flatten())
-        model.add(Dense(50176))
+        model.add(Dense(29400))
         model.add(BatchNormalization())
-        model.add(Reshape((7,7,1024)))
+        model.add(Reshape((7,7,600)))
         model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
         model.add(BatchNormalization()) # 14
         model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
