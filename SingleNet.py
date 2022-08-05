@@ -11,11 +11,11 @@ import os
 
 class GAN():
     def __init__(self):
-        self.img_rows = 64
-        self.img_cols = 64
+        self.img_rows = 224
+        self.img_cols = 224
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
-        self.img_gen_shape = (64,64,1)
+        self.img_gen_shape = (224,224,1)
 
         optimizer = adam_v2.Adam(0.05, 0.5)
 
@@ -48,14 +48,14 @@ class GAN():
 
         model = Sequential()
 
-        # model.add(Conv2D(96,11,4,padding='valid')) # conv1
-        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool1
-        # model.add(Conv2D(256,5,1,padding='same')) # conv2
-        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
-        # model.add(Conv2D(384,3,1,padding='same')) # conv3
-        # model.add(Conv2D(384,3,1,padding='same')) # conv4
-        # model.add(Conv2D(256,3,1,padding='same')) # conv5
-        # model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
+        model.add(Conv2D(96,11,4,padding='valid')) # conv1
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool1
+        model.add(Conv2D(256,5,1,padding='same')) # conv2
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool2
+        model.add(Conv2D(384,3,1,padding='same')) # conv3
+        model.add(Conv2D(384,3,1,padding='same')) # conv4
+        model.add(Conv2D(256,3,1,padding='same')) # conv5
+        model.add(MaxPool2D(3,2,padding='valid')) # maxpool5
 
 
         # model.add(Conv2D(64,(4,4),(2,2),padding='same'))
@@ -82,19 +82,25 @@ class GAN():
         # model.add(Activation('sigmoid'))
 
 
-        model.add(Conv2D(64,(4,4),(2,2),padding='same'))
-        model.add(Conv2D(128,(4,4),(2,2),padding='same'))
-        model.add(Conv2D(256,(4,4),(2,2),padding='same'))
-        model.add(Conv2D(512,(4,4),(2,2),padding='same'))
-        model.add(Conv2D(512,(4,4),(1,1),padding='same'))
+        # model.add(Conv2D(64,(4,4),(2,2),padding='same'))
+        # model.add(Conv2D(128,(4,4),(2,2),padding='same'))
+        # model.add(Conv2D(256,(4,4),(2,2),padding='same'))
+        # model.add(Conv2D(512,(4,4),(2,2),padding='same'))
+        # model.add(Conv2D(512,(4,4),(1,1),padding='same'))
         model.add(Flatten())
-        model.add(Dense(16384))
+        model.add(Dense(50176))
         model.add(BatchNormalization())
-        model.add(Reshape((4,4,1024)))
-        model.add(Conv2DTranspose(256,(4,4),(4,4),padding='same'))
-        model.add(BatchNormalization())
-        model.add(Conv2DTranspose(1,(4,4),(4,4),padding='same'))
-        model.add(BatchNormalization())
+        model.add(Reshape((7,7,1024)))
+        model.add(Conv2DTranspose(512,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization()) # 14
+        model.add(Conv2DTranspose(256,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization()) # 28
+        model.add(Conv2DTranspose(128,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization()) # 56
+        model.add(Conv2DTranspose(64,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization()) # 112
+        model.add(Conv2DTranspose(1,(4,4),(2,2),padding='same'))
+        model.add(BatchNormalization()) # 224
         model.add(Activation('sigmoid'))
 
         label = Input(shape=self.img_shape)
