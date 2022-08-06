@@ -17,7 +17,7 @@ class GAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.img_gen_shape = (224,224,1)
 
-        optimizer = adam_v2.Adam(0.05, 0.5)
+        optimizer = adam_v2.Adam(0.1, 0.5)
 
         # Create Dirs
         if(not os.path.exists('models')):
