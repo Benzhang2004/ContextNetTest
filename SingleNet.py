@@ -30,14 +30,18 @@ class GAN():
             with open('models/epoch','r') as f:
                 self.epo = int(f.read())
 
-        # Build the generator
-        self.generator = self.build_generator()
-        self.generator.compile(loss='binary_crossentropy',
-            optimizer=optimizer)
+        strategy = tf.distribute.MirroredStrategy()
+        print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+        with strategy.scope():
 
-        # Load the generator weights
-        if(os.path.exists('models/gen.h5')):
-            self.generator.load_weights('models/gen.h5')
+            # Build the generator
+            self.generator = self.build_generator()
+            self.generator.compile(loss='binary_crossentropy',
+                optimizer=optimizer)
+
+            # Load the generator weights
+            if(os.path.exists('models/gen.h5')):
+                self.generator.load_weights('models/gen.h5')
 
 
         # Load the dataset
@@ -158,7 +162,8 @@ class GAN():
 if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-    tf.config.experimental.set_virtual_device_configuration(gpus[0],[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32768)])
+    for i in gpus:
+        tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32768)])
 
     gan = GAN()
     gan. train(epochs=100000, batch_size=512, sample_interval=10)
