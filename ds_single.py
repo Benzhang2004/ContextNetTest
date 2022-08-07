@@ -50,6 +50,7 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
         return int((ds.X_train.shape[0])/self.batch_size)
 
     def __getitem__(self, idx):
+
         batch_Y = []
         batch_y = []
 
@@ -67,7 +68,7 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
             mask = np.asarray(mask)
             imgarray_s = np.where(mask>0,-1,imgarray)
             batch_Y.append(imgarray_s)
-            batch_y.append(np.multiply(np.where(np.array(batch_Y) < 0, 1, 0),imgarray))
+            batch_y.append(np.multiply(np.where(np.array(imgarray_s) < 0, 1, 0),imgarray))
 
 
 
