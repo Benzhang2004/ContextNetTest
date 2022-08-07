@@ -163,7 +163,7 @@ if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
     for i in gpus:
-        tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=32768)])
+        tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
 
     gan = GAN()
     gan. train(epochs=100000, batch_size=512, sample_interval=10)
