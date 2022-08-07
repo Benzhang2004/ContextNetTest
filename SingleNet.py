@@ -20,14 +20,14 @@ class GAN():
         optimizer = adam_v2.Adam(0.1, 0.5)
 
         # Create Dirs
-        if(not os.path.exists('models')):
-            os.mkdir('models')
-        if(not os.path.exists('images')):
-            os.mkdir('images')
+        if(not os.path.exists('/gemini/output/models')):
+            os.mkdir('/gemini/output/models')
+        if(not os.path.exists('/gemini/output/images')):
+            os.mkdir('/gemini/output/images')
 
         self.epo = 0
-        if(os.path.exists('models/epoch')):
-            with open('models/epoch','r') as f:
+        if(os.path.exists('/gemini/output/models/epoch')):
+            with open('/gemini/output/models/epoch','r') as f:
                 self.epo = int(f.read())
 
         strategy = tf.distribute.MirroredStrategy()
@@ -40,8 +40,8 @@ class GAN():
                 optimizer=optimizer)
 
             # Load the generator weights
-            if(os.path.exists('models/gen.h5')):
-                self.generator.load_weights('models/gen.h5')
+            if(os.path.exists('/gemini/output/models/gen.h5')):
+                self.generator.load_weights('/gemini/output/models/gen.h5')
 
 
         # Load the dataset
@@ -150,12 +150,12 @@ class GAN():
         axs[1].axis('off')
         axs[2].axis('off')
         axs[3].axis('off')
-        fig.savefig("images/%d.png" % epoch)
+        fig.savefig("/gemini/output/images/%d.png" % epoch)
         plt.close()
 
     def save_models(self):
-        self.generator.save_weights('models/gen.h5')
-        with open('models/epoch','w') as f:
+        self.generator.save_weights('/gemini/output/models/gen.h5')
+        with open('/gemini/output/models/epoch','w') as f:
             f.write(str(self.cur_iter))
 
 
