@@ -47,7 +47,7 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
         self.batch_size = batch_size
 
     def __len__(self):
-        return int((ds.X_train.shape[0])/self.batch_size)
+        return int((li)/self.batch_size)
 
     def __getitem__(self, idx):
 
