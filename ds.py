@@ -4,13 +4,6 @@ from PIL import Image
 import numpy as np
 import cv2
 
-l = os.listdir('data/train')
-l = [i for i in l if os.path.isdir('data/train/'+i)]
-li = []
-for p in l:
-    li += ['data/train/'+p+'/'+i for i in os.listdir('data/train/'+p) if i.split('.')[-1]== 'jpg']
-
-
 X_train = []
 Y_train = []
 y_train = []
@@ -45,31 +38,11 @@ def random_polygon(edge_num, center, radius_range):
     return points
 
 
-## preprocessing training data
-for (x, item) in enumerate(li):
-    im = Image.open(item)
-    im = im.resize((224,224))
-    im=im.convert('L')
-    im=im.point(COLOR_table,'L')
-    imgarray = np.asarray(im)
-    X_train.append(np.asarray(im.resize((224,224))))
-    mask = np.zeros((224,224),dtype=np.uint8)
-    r1 = randint(3,63)
-    r2 = randint(3,63)
-    points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
-    mask = cv2.fillPoly(mask, [points1], (255))
-    mask = np.asarray(mask)
-    imgarray = np.where(mask>0,-1,imgarray)
-    Y_train.append(imgarray)
-    ytr = np.asarray(Image.fromarray(imgarray).resize((224,224)))
-    y_train.append(ytr)
-
-
-li = os.listdir('data/test')
+li = os.listdir('/gemini/data-1/test')
 li = [i for i in li if i.split('.')[-1]== 'jpg']
 
 for (x, item) in enumerate(li):
-    im = Image.open('data/test/'+item)
+    im = Image.open('/gemini/data-1/test/'+item)
     im = im.resize((224,224))
     im=im.convert('L')
     im=im.point(COLOR_table,'L')
@@ -95,82 +68,3 @@ y_test = np.array(y_test)
 
 def load_data():
     return (X_train,Y_train,y_train),(X_test,Y_test,y_test)
-
-
-def remask(idx):
-    imgarray = X_train[idx,:,:,0]
-    mask = np.zeros((224,224),dtype=np.uint8)
-    r1 = randint(3,63)
-    r2 = randint(3,63)
-    points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
-    mask = cv2.fillPoly(mask, [points1], (255))
-    mask = np.asarray(mask)
-    imgarray = np.where(mask>0,-1,imgarray)
-    global Y_train, y_train
-    Y_train[idx] = np.expand_dims(imgarray, axis=2)
-    # ytr = np.asarray(Image.fromarray(imgarray).resize((224,224)))
-    # ytr = imgarray
-    y_train[idx] = np.expand_dims(ytr, axis=2)
-
-
-# Train datasets generators
-
-epo_cur = 0
-
-epo = 0
-idxs = []
-genX_cur = 0
-genY_cur = 0
-geny_cur = 0
-batch_size = 0
-epochs = 0
-
-def init_data():
-    global X_train,Y_train,y_train,idxs
-    X_train = np.expand_dims(X_train, axis=3)
-    Y_train = np.expand_dims(Y_train, axis=3)
-    y_train = np.expand_dims(y_train, axis=3)
-    idxs += list(np.random.randint(0, X_train.shape[0], batch_size*10))
-
-def _gen_Xtrain():
-    global genX_cur
-    for i in range(epo, epochs):
-        for j in range(batch_size):
-            Xx = X_train[idxs[genX_cur]]
-            if(genX_cur<min(genY_cur,geny_cur)):
-                remask(idxs[genX_cur])
-            genX_cur+=1
-            yield Xx
-            gc()
-
-def _gen_Ytrain():
-    global genY_cur
-    for i in range(epo, epochs):
-        for j in range(batch_size):
-            Yx = Y_train[idxs[genY_cur]]
-            if(genY_cur<min(genX_cur,geny_cur)):
-                remask(idxs[genY_cur])
-            genY_cur+=1
-            yield Yx
-            gc()
-
-def _gen_ytrain():
-    global geny_cur
-    for i in range(epo, epochs):
-        for j in range(batch_size):
-            y = y_train[idxs[geny_cur]]
-            if(geny_cur<min(genY_cur,genX_cur)):
-                remask(idxs[geny_cur])
-            geny_cur+=1
-            yield y
-            gc()
-
-def gc():
-    global genX_cur,genY_cur,geny_cur, idxs
-    a = min(genX_cur,genY_cur,geny_cur)
-    idxs = idxs[a:]
-    genX_cur -= a
-    genY_cur -= a
-    geny_cur -= a
-    if(max(genX_cur,genY_cur,geny_cur)>len(idxs)-5):
-        idxs += list(np.random.randint(0, X_train.shape[0], batch_size*10))

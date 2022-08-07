@@ -118,7 +118,7 @@ class GAN():
 
         epoch = self.epo
         for i in range(int(epochs/sample_interval)):
-            self.generator.fit(Yytrain, epochs=sample_interval)
+            self.generator.fit(Yytrain, epochs=sample_interval, max_queue_size=100, workers=10, use_multiprocessing=True)
             epoch+=sample_interval
             self.cur_iter = epoch
             self.sample_images(epoch)
