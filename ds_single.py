@@ -70,10 +70,12 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
             batch_Y.append(imgarray_s)
             batch_y.append(np.multiply(np.where(np.array(imgarray_s) < 0, 1, 0),imgarray))
 
-        print('load_data: ',idx)
+        with tf.device('/gpu:0'):
+            # batch_Y = np.array(batch_Y)
+            # batch_y = np.array(batch_y)
 
-        batch_Y = np.array(batch_Y)
-        batch_y = np.array(batch_y)
+            batch_Y = tf.constant(batch_Y)
+            batch_y = tf.constant(batch_y)
         return batch_Y, batch_y
 
 # class SingleNetTrDS_Noshade(tf.keras.utils.Sequence):
