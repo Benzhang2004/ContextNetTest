@@ -70,7 +70,7 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
             batch_Y.append(imgarray_s)
             batch_y.append(np.multiply(np.where(np.array(imgarray_s) < 0, 1, 0),imgarray))
 
-
+        print('load_data: ',idx)
 
         batch_Y = np.array(batch_Y)
         batch_y = np.array(batch_y)
