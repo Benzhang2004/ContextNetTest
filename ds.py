@@ -11,6 +11,9 @@ Y_test = []
 X_test = []
 y_test = []
 
+doc_data = 'data/'
+doc_output = ''
+
 MAX_VAL = 180
 COLOR_table = []
 for i in range(256):
@@ -38,11 +41,11 @@ def random_polygon(edge_num, center, radius_range):
     return points
 
 
-li = os.listdir('/gemini/data-1/test')
+li = os.listdir(doc_data+'test')
 li = [i for i in li if i.split('.')[-1]== 'jpg']
 
 for (x, item) in enumerate(li):
-    im = Image.open('/gemini/data-1/test/'+item)
+    im = Image.open(doc_data+'test/'+item)
     im = im.resize((224,224))
     im=im.convert('L')
     im=im.point(COLOR_table,'L')

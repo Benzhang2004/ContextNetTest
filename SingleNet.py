@@ -10,24 +10,26 @@ import matplotlib.pyplot as plt
 import os
 
 class GAN():
-    def __init__(self):
+    def __init__(self, data, output):
         self.img_rows = 224
         self.img_cols = 224
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.img_gen_shape = (224,224,1)
+        self.data = data
+        self.output = output
 
         optimizer = adam_v2.Adam(0.1, 0.5)
 
         # Create Dirs
-        if(not os.path.exists('/gemini/output/models')):
-            os.mkdir('/gemini/output/models')
-        if(not os.path.exists('/gemini/output/images')):
-            os.mkdir('/gemini/output/images')
+        if(not os.path.exists(self.output+'models')):
+            os.mkdir(self.output+'models')
+        if(not os.path.exists(self.output+'images')):
+            os.mkdir(self.output+'images')
 
         self.epo = 0
-        if(os.path.exists('/gemini/output/models/epoch')):
-            with open('/gemini/output/models/epoch','r') as f:
+        if(os.path.exists(self.output+'models/epoch')):
+            with open(self.output+'models/epoch','r') as f:
                 self.epo = int(f.read())
 
         strategy = tf.distribute.MirroredStrategy()
@@ -40,8 +42,8 @@ class GAN():
                 optimizer=optimizer)
 
             # Load the generator weights
-            if(os.path.exists('/gemini/output/models/gen.h5')):
-                self.generator.load_weights('/gemini/output/models/gen.h5')
+            if(os.path.exists(self.output+'models/gen.h5')):
+                self.generator.load_weights(self.output+'models/gen.h5')
 
 
         # Load the dataset
@@ -154,8 +156,8 @@ class GAN():
         plt.close()
 
     def save_models(self):
-        self.generator.save_weights('/gemini/output/models/gen.h5')
-        with open('/gemini/output/models/epoch','w') as f:
+        self.generator.save_weights(self.output+'models/gen.h5')
+        with open(self.output+'models/epoch','w') as f:
             f.write(str(self.cur_iter))
 
 
@@ -165,5 +167,5 @@ if __name__ == '__main__':
     for i in gpus:
         tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
 
-    gan = GAN()
+    gan = GAN('data/','')
     gan. train(epochs=100000, batch_size=512, sample_interval=10)

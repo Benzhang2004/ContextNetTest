@@ -8,11 +8,14 @@ import cv2
 
 (_,_,_),(X_test,Y_test,y_test) = ds.load_data()
 
-l = os.listdir('/gemini/data-1/train')
-l = [i for i in l if os.path.isdir('/gemini/data-1/train/'+i)]
+doc_data = 'data/'
+doc_output = ''
+
+l = os.listdir(doc_data+'train')
+l = [i for i in l if os.path.isdir(doc_data+'train/'+i)]
 li = []
 for p in l:
-    li += ['/gemini/data-1/train/'+p+'/'+i for i in os.listdir('/gemini/data-1/train/'+p) if i.split('.')[-1]== 'jpg']
+    li += [doc_data+'train/'+p+'/'+i for i in os.listdir(doc_data+'train/'+p) if i.split('.')[-1]== 'jpg']
 
 MAX_VAL = 180
 COLOR_table = []
