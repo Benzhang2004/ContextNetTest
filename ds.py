@@ -4,15 +4,22 @@ from PIL import Image
 import numpy as np
 import cv2
 
+doc_data = '/gemini/data-1/'
+doc_output = '/gemini/output/'
+
+l = os.listdir(doc_data+'train')
+l = [i for i in l if os.path.isdir(doc_data+'train/'+i)]
+li = []
+for p in l:
+    li += [doc_data+'train/'+p+'/'+i for i in os.listdir(doc_data+'train/'+p) if i.split('.')[-1]== 'jpg']
+
+
 X_train = []
 Y_train = []
 y_train = []
 Y_test = []
 X_test = []
 y_test = []
-
-doc_data = 'data/'
-doc_output = ''
 
 MAX_VAL = 180
 COLOR_table = []
@@ -39,6 +46,26 @@ def random_polygon(edge_num, center, radius_range):
     points += np.array(center)
     points = np.round(points).astype(np.int32)
     return points
+
+
+## preprocessing training data
+for (x, item) in enumerate(li[:5000]):
+    im = Image.open(item)
+    im = im.resize((224,224))
+    im=im.convert('L')
+    im=im.point(COLOR_table,'L')
+    imgarray = np.asarray(im)
+    X_train.append(np.asarray(im.resize((224,224))))
+    mask = np.zeros((224,224),dtype=np.uint8)
+    r1 = randint(3,16)
+    r2 = randint(3,16)
+    points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
+    mask = cv2.fillPoly(mask, [points1], (255))
+    mask = np.asarray(mask)
+    imgarray = np.where(mask>0,-1,imgarray)
+    Y_train.append(imgarray)
+    ytr = np.asarray(Image.fromarray(imgarray).resize((224,224)))
+    y_train.append(ytr)
 
 
 li = os.listdir(doc_data+'test')

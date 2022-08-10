@@ -120,11 +120,13 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
-        Yytrain = ds.SingleNetTrDS(batch_size)
+        # Yytrain = ds.SingleNetTrDS(batch_size)
+        ds.Y_train = tf.convert_to_tensor(ds.Y_train)
+        ds.y_train = tf.convert_to_tensor(ds.y_train)
 
         epoch = self.epo
         for i in range(int(epochs/sample_interval)):
-            self.generator.fit(Yytrain, epochs=sample_interval, max_queue_size=100, workers=20, use_multiprocessing=True)
+            self.generator.fit(ds.Y_train, ds.y_train, epochs=sample_interval, max_queue_size=100, workers=20, use_multiprocessing=True)
             epoch+=sample_interval
             self.cur_iter = epoch
             self.sample_images(epoch)
