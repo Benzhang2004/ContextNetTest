@@ -154,7 +154,7 @@ class GAN():
         axs[1].axis('off')
         axs[2].axis('off')
         axs[3].axis('off')
-        fig.savefig("/gemini/output/images/%d.png" % epoch)
+        fig.savefig(self.output+"images/%d.png" % epoch)
         plt.close()
 
     def save_models(self):
