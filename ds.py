@@ -7,6 +7,9 @@ import cv2
 doc_data = '/gemini/data-1/'
 doc_output = '/gemini/output/'
 
+# doc_data = 'data/'
+# doc_output = ''
+
 l = os.listdir(doc_data+'train')
 l = [i for i in l if os.path.isdir(doc_data+'train/'+i)]
 li = []
@@ -49,7 +52,7 @@ def random_polygon(edge_num, center, radius_range):
 
 
 ## preprocessing training data
-for (x, item) in enumerate(li[:5000]):
+for (x, item) in enumerate(li):
     im = Image.open(item)
     im = im.resize((224,224))
     im=im.convert('L')

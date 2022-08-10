@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image 
 import cv2
 
-# (_,_,_),(X_test,Y_test,y_test) = ds.load_data()
+(_,_,_),(X_test,Y_test,y_test) = ds.load_data()
 
 (X_train,Y_train,y_train),(X_test,Y_test,y_test) = ds.load_data()
 y_train = np.multiply(np.where(Y_train < 0, 1, 0),X_train)
@@ -14,6 +14,9 @@ y_train = np.multiply(np.where(Y_train < 0, 1, 0),X_train)
 
 doc_data = '/gemini/data-1/'
 doc_output = '/gemini/output/'
+
+# doc_data = 'data/'
+# doc_output = ''
 
 l = os.listdir(doc_data+'train')
 l = [i for i in l if os.path.isdir(doc_data+'train/'+i)]
@@ -77,13 +80,18 @@ class SingleNetTrDS(tf.keras.utils.Sequence):
             batch_Y.append(imgarray_s)
             batch_y.append(np.multiply(np.where(np.array(imgarray_s) < 0, 1, 0),imgarray))
 
-        # with tf.device('/gpu:0'):
-        batch_Y = np.array(batch_Y)
-        batch_y = np.array(batch_y)
+        with tf.device('/gpu:0'):
+        # batch_Y = np.array(batch_Y)
+        # batch_y = np.array(batch_y)
 
-            # batch_Y = tf.constant(batch_Y)
-            # batch_y = tf.constant(batch_y)
+            batch_Y = tf.convert_to_tensor(batch_Y)
+            batch_y = tf.convert_to_tensor(batch_y)
         return batch_Y, batch_y
+
+def Generator(seq):
+    while True:
+        for item in seq:
+            yield item
 
 # class SingleNetTrDS_Noshade(tf.keras.utils.Sequence):
 #     def __init__(self, batch_size):

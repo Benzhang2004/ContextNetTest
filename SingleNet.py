@@ -32,18 +32,18 @@ class GAN():
             with open(self.output+'models/epoch','r') as f:
                 self.epo = int(f.read())
 
-        strategy = tf.distribute.MirroredStrategy()
-        print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
-        with strategy.scope():
+        # strategy = tf.distribute.MirroredStrategy()
+        # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+        # with strategy.scope():
 
-            # Build the generator
-            self.generator = self.build_generator()
-            self.generator.compile(loss='binary_crossentropy',
-                optimizer=optimizer)
+        # Build the generator
+        self.generator = self.build_generator()
+        self.generator.compile(loss='binary_crossentropy',
+            optimizer=optimizer)
 
-            # Load the generator weights
-            if(os.path.exists(self.output+'models/gen.h5')):
-                self.generator.load_weights(self.output+'models/gen.h5')
+        # Load the generator weights
+        if(os.path.exists(self.output+'models/gen.h5')):
+            self.generator.load_weights(self.output+'models/gen.h5')
 
 
         # Load the dataset
@@ -121,16 +121,34 @@ class GAN():
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
         # Yytrain = ds.SingleNetTrDS(batch_size)
-        ds.Y_train = tf.convert_to_tensor(ds.Y_train)
-        ds.y_train = tf.convert_to_tensor(ds.y_train)
 
         epoch = self.epo
+
+        # Auto Train
         for i in range(int(epochs/sample_interval)):
             self.generator.fit(ds.Y_train, ds.y_train, epochs=sample_interval, max_queue_size=100, workers=20, use_multiprocessing=True)
             epoch+=sample_interval
             self.cur_iter = epoch
             self.sample_images(epoch)
             self.save_models()
+        
+        # Customized Train
+        # for i in range(int(epochs/sample_interval)):
+        #     for epoch in range(1,sample_interval):
+        #         print("Epoch: "+str(epoch))
+        #         print('',end='')
+        #         trdata = tf.data.Dataset.from_generator(ds.Generator,output_signature=(
+        #             tf.TensorSpec(shape=(batch_size,)+(224,224), dtype=tf.float32),
+        #             tf.TensorSpec(shape=(batch_size,)+(224,224), dtype=tf.float32)),args=[Yytrain])
+        #         trdata = trdata.prefetch(10)
+        #         for j in range(len(Yytrain)):
+        #             Y,y = next(trdata)
+        #             loss = self.generator.train_on_batch(Y,y)
+        #             print('\r')
+        #             print(str(j+1)+'/'+str(len(Yytrain))+'\t'+"Loss: "+str(loss),end='')
+        #         print('')
+
+
             
             
 
@@ -167,7 +185,8 @@ if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
     for i in gpus:
-        tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
+        # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
+        tf.config.experimental.set_memory_growth(i,True)
 
-    gan = GAN('data/','')
+    gan = GAN('/gemini/data-1/','/gemini/output/')
     gan. train(epochs=100000, batch_size=512, sample_interval=10)
