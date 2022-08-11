@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image 
 import cv2
 
-(_,_,_),(X_test,Y_test,y_test) = ds.load_data()
+# (_,_,_),(X_test,Y_test,y_test) = ds.load_data()
 
 (X_train,Y_train,y_train),(X_test,Y_test,y_test) = ds.load_data()
 y_train = np.multiply(np.where(Y_train < 0, 1, 0),X_train)
