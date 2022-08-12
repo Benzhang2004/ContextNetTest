@@ -4,7 +4,7 @@ from keras.models import Sequential, Model
 from keras.optimizers import adam_v2
 import tensorflow as tf
 import keras.layers.merge as merge
-import ds_single as ds
+import ds_gpu as ds
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -47,7 +47,7 @@ class GAN():
 
 
         # Load the dataset
-        (self.X_train,self.Y_train,self.y_train),(self.X_test, self.Y_test, self.y_test) = ds.load_data()
+        (self.X_test, self.Y_test, self.y_test) = ds.load_test_data()
 
 
     def build_generator(self):
@@ -120,33 +120,33 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
-        Yytrain = ds.SingleNetTrDS(batch_size)
+        Yytrain, num = ds.load_train_data(batch_size)
 
         epoch = self.epo
 
         # Auto Train
+        # for i in range(int(epochs/sample_interval)):
+        #     self.generator.fit(Yytrain, epochs=sample_interval, max_queue_size=100, workers=20, use_multiprocessing=True)
+        #     epoch+=sample_interval
+        #     self.cur_iter = epoch
+        #     self.sample_images(epoch)
+        #     self.save_models()
+        
+        # Customized Train
         for i in range(int(epochs/sample_interval)):
-            self.generator.fit(Yytrain, epochs=sample_interval, max_queue_size=100, workers=20, use_multiprocessing=True)
+            for h in range(1,sample_interval):
+                print("Epoch: "+str(h))
+                print('',end='')
+                for j in range(num):
+                    Y,y = next(Yytrain)
+                    loss = self.generator.train_on_batch(Y,y)
+                    print('\r')
+                    print(str(j+1)+'/'+str(len(Yytrain))+'\t'+"Loss: "+str(loss),end='')
+                print('')
             epoch+=sample_interval
             self.cur_iter = epoch
             self.sample_images(epoch)
             self.save_models()
-        
-        # Customized Train
-        # for i in range(int(epochs/sample_interval)):
-        #     for epoch in range(1,sample_interval):
-        #         print("Epoch: "+str(epoch))
-        #         print('',end='')
-        #         trdata = tf.data.Dataset.from_generator(ds.Generator,output_signature=(
-        #             tf.TensorSpec(shape=(batch_size,)+(224,224), dtype=tf.float32),
-        #             tf.TensorSpec(shape=(batch_size,)+(224,224), dtype=tf.float32)),args=[Yytrain])
-        #         trdata = trdata.prefetch(10)
-        #         for j in range(len(Yytrain)):
-        #             Y,y = next(trdata)
-        #             loss = self.generator.train_on_batch(Y,y)
-        #             print('\r')
-        #             print(str(j+1)+'/'+str(len(Yytrain))+'\t'+"Loss: "+str(loss),end='')
-        #         print('')
 
 
             
