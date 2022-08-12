@@ -95,6 +95,8 @@ def load_train_data(batch_size, workers=8):
     import tensorflow as tf
     l = range(len(li)//batch_size)
     rtn = poo.map(process_tr_data, l)
+    poo.close()
+    poo.join()
     return Generator(rtn),l
 
 
