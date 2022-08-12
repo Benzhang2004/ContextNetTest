@@ -186,8 +186,8 @@ if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
     for i in gpus:
-        # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
-        tf.config.experimental.set_memory_growth(i,True)
+        tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=78272)])
+        # tf.config.experimental.set_memory_growth(i,True)
 
     gan = GAN('/gemini/data-1/','/gemini/output/')
     # gan = GAN('data/','')
