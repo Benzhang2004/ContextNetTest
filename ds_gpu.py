@@ -97,6 +97,7 @@ def load_train_data(batch_size, workers=8):
     rtn = poo.map(process_tr_data, l)
     poo.close()
     poo.join()
+    print('ds: loaded train data!')
     return Generator(rtn),l
 
 
