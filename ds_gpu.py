@@ -8,8 +8,8 @@ import cv2
 doc_data = '/gemini/data-1/'
 doc_output = '/gemini/output/'
 
-doc_data = 'data/'
-doc_output = ''
+# doc_data = 'data/'
+# doc_output = ''
 
 l = os.listdir(doc_data+'train')
 l = [i for i in l if os.path.isdir(doc_data+'train/'+i)]
@@ -56,6 +56,10 @@ def random_polygon(edge_num, center, radius_range):
 def _pool_init():
     global tf, batch_size
     import tensorflow as tf
+    gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+    for i in gpus:
+        # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
+        tf.config.experimental.set_memory_growth(i,True)
 
 def init_proc():
     poo = Pool(processes=8,initializer=_pool_init)
