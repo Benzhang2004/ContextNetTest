@@ -8,8 +8,8 @@ import cv2
 doc_data = '/gemini/data-1/'
 doc_output = '/gemini/output/'
 
-# doc_data = 'data/'
-# doc_output = ''
+doc_data = 'data/'
+doc_output = ''
 
 l = os.listdir(doc_data+'train')
 l = [i for i in l if os.path.isdir(doc_data+'train/'+i)]
@@ -90,7 +90,9 @@ def Generator(seq):
 
 
 def load_train_data(batch_size, workers=8):
-    poo = Pool(processes=workers,initializer=_pool_init)
+    poo = Pool(processes=workers,initializer=_pool_init, initargs=[batch_size])
+    global tf
+    import tensorflow as tf
     l = range(len(li)//batch_size)
     rtn = poo.map(process_tr_data, l)
     return Generator(rtn),l
@@ -101,34 +103,36 @@ def load_train_data(batch_size, workers=8):
 # y_train = tf.TensorArray(tf.float32, size=0, dynamic_size=True, clear_after_read=False)
 
 
+def process_tst_data():
+    global X_test,Y_test,y_test
 
-li = os.listdir(doc_data+'test')
-li = [i for i in li if i.split('.')[-1]== 'jpg']
+    li = os.listdir(doc_data+'test')
+    li = [i for i in li if i.split('.')[-1]== 'jpg']
 
-for (x, item) in enumerate(li):
-    im = Image.open(doc_data+'test/'+item)
-    im = im.resize((224,224))
-    im=im.convert('L')
-    im=im.point(COLOR_table,'L')
-    imgarray = np.asarray(im)
-    X_test.append(np.asarray(im.resize((224,224))))
-    mask = np.zeros((224,224),dtype=np.uint8)
-    r1 = randint(3,63)
-    r2 = randint(3,63)
-    points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
-    mask = cv2.fillPoly(mask, [points1], (255))
-    mask = np.asarray(mask)
-    imgarray = np.where(mask>0,-1,imgarray)
-    Y_test.append(imgarray)
-    yte = np.asarray(Image.fromarray(imgarray).resize((224,224)))
-    y_test.append(yte)
+    for (x, item) in enumerate(li):
+        im = Image.open(doc_data+'test/'+item)
+        im = im.resize((224,224))
+        im=im.convert('L')
+        im=im.point(COLOR_table,'L')
+        imgarray = np.asarray(im)
+        X_test.append(np.asarray(im.resize((224,224))))
+        mask = np.zeros((224,224),dtype=np.uint8)
+        r1 = randint(3,63)
+        r2 = randint(3,63)
+        points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
+        mask = cv2.fillPoly(mask, [points1], (255))
+        mask = np.asarray(mask)
+        imgarray = np.where(mask>0,-1,imgarray)
+        Y_test.append(imgarray)
+        yte = np.asarray(Image.fromarray(imgarray).resize((224,224)))
+        y_test.append(yte)
 
-# X_train = np.array(X_train)
-# Y_train = np.array(Y_train)
-# y_train = np.array(y_train)
-X_test = np.array(X_test)
-Y_test = np.array(Y_test)
-y_test = np.array(y_test)
+
+    X_test = np.array(X_test)
+    Y_test = np.array(Y_test)
+    y_test = np.array(y_test)
 
 def load_test_data():
+    process_tst_data()
+    print("ds: loaded test data!")
     return (X_test,Y_test,y_test)

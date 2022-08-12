@@ -188,5 +188,6 @@ if __name__ == '__main__':
         # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
         tf.config.experimental.set_memory_growth(i,True)
 
-    gan = GAN('/gemini/data-1/','/gemini/output/')
+    # gan = GAN('/gemini/data-1/','/gemini/output/')
+    gan = GAN('data/','')
     gan. train(epochs=100000, batch_size=512, sample_interval=10)
