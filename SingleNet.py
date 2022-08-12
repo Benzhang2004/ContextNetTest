@@ -1,13 +1,14 @@
-from unicodedata import name
-from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D, Dropout
-from keras.models import Sequential, Model
-from keras.optimizers import adam_v2
-import tensorflow as tf
-import keras.layers.merge as merge
 import ds_gpu as ds
-import numpy as np
-import matplotlib.pyplot as plt
-import os
+if __name__=="__main__":
+    poo = ds.init_proc()
+    from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D, Dropout
+    from keras.models import Sequential, Model
+    from keras.optimizers import adam_v2
+    import tensorflow as tf
+    import keras.layers.merge as merge
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import os
 
 class GAN():
     def __init__(self, data, output):
@@ -120,7 +121,7 @@ class GAN():
     def train(self, epochs, batch_size=128, sample_interval=50):
 
         # (XX, 227, 227) -> (XX, 227, 227, 1)
-        Yytrain, num = ds.load_train_data(batch_size)
+        Yytrain, num = ds.load_train_data(poo, batch_size)
 
         epoch = self.epo
 

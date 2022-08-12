@@ -27,6 +27,8 @@ y_test = []
 
 MAX_VAL = 180
 COLOR_table = []
+batch_size = 512
+
 for i in range(256):
     if(i<MAX_VAL):
         COLOR_table.append(1)
@@ -51,10 +53,13 @@ def random_polygon(edge_num, center, radius_range):
     points = np.round(points).astype(np.int32)
     return points
 
-def _pool_init(b_size):
+def _pool_init():
     global tf, batch_size
     import tensorflow as tf
-    batch_size = b_size
+
+def init_proc():
+    poo = Pool(processes=8,initializer=_pool_init)
+    return poo
 
 ## preprocessing training data
 def process_tr_data(idx):
@@ -89,8 +94,7 @@ def Generator(seq):
             yield item
 
 
-def load_train_data(batch_size, workers=8):
-    poo = Pool(processes=workers,initializer=_pool_init, initargs=[batch_size])
+def load_train_data(poo: Pool,b_size):
     global tf
     import tensorflow as tf
     l = range(len(li)//batch_size)
