@@ -1,9 +1,9 @@
-import gc
 import os
 from random import randint
 from PIL import Image
-from multiprocessing import Pool
+from multiprocessing.dummy import Pool
 import numpy as np
+import tensorflow as tf
 import cv2
 
 doc_data = '/gemini/data-1/'
@@ -28,7 +28,7 @@ y_test = []
 
 MAX_VAL = 180
 COLOR_table = []
-batch_size = 1024
+batch_size = 512
 
 for i in range(256):
     if(i<MAX_VAL):
@@ -55,17 +55,15 @@ def random_polygon(edge_num, center, radius_range):
     return points
 
 def _pool_init():
-    # global tf, batch_size
-    global batch_size
+    global tf, batch_size
     # import tensorflow as tf
-    # gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-    # for i in gpus:
-    #     tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=81920)])
-        # tf.config.experimental.set_memory_growth(i,True)
+    gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+    for i in gpus:
+        # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
+        tf.config.experimental.set_memory_growth(i,True)
 
 def init_proc():
     poo = Pool(processes=8,initializer=_pool_init)
-    
     return poo
 
 ## preprocessing training data
@@ -90,12 +88,13 @@ def process_tr_data(idx):
         # ytr = np.asarray(Image.fromarray(imgarray).resize((224,224)))
         ytr = np.multiply(np.where(imgarray < 0, 1, 0),imgarr)
         y_train.append(ytr)
-    # with tf.device('/GPU:0'):
-        # Y_train = tf.constant(Y_train)
-        # y_train = tf.constant(y_train)
-    gc.collect()
-    print("gen batch: ",idx)
-    return np.array(Y_train), np.array(y_train)
+    Y_train = np.array(Y_train)
+    y_train = np.array(y_train)
+    with tf.device('/GPU:0'):
+        Y_train = tf.constant(Y_train.tolist())
+        y_train = tf.constant(y_train.tolist())
+    print(type(Y_train))
+    return Y_train, y_train
 
 def Generator(seq):
     while True:
@@ -104,38 +103,14 @@ def Generator(seq):
 
 
 def load_train_data(poo: Pool,b_size):
-    import tensorflow as tf
-    rtn = []
+    # global tf
+    # import tensorflow as tf
     l = range(len(li)//batch_size)
-    rl = []
-    for i in l:
-        rl.append(poo.apply_async(process_tr_data, (i,)))
-    print("ds: all tr sended")
-    gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
-    for i in gpus:
-        tf.config.experimental.set_memory_growth(i,True)
-    while True:
-        flag = True
-        for (x,i) in enumerate(rl):
-            if(i!=0):
-                if(i.ready()):
-                    obj_a,obj_b = i.get()
-                    with tf.device('/GPU:0'):
-                        obj_a = tf.constant(obj_a.tolist())
-                        obj_b = tf.constant(obj_b.tolist())
-                    rtn.append((obj_a,obj_b))
-                    rl[x] = 0
-                    print("put batch: ",x, rtn[0][0].device)
-                else:
-                    flag = False
-            gc.collect()
-            print('check')
-        if(flag):
-            break
+    rtn = poo.map(process_tr_data, l)
     poo.close()
     poo.join()
     print('ds: loaded train data!')
-    return Generator(rtn),l
+    return Generator(rtn),len(l)
 
 
 # X_train = tf.TensorArray(tf.float32, size=0, dynamic_size=True, clear_after_read=False)

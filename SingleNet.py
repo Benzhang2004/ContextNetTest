@@ -1,14 +1,14 @@
 import ds_gpu as ds
-if __name__=="__main__":
-    poo = ds.init_proc()
-    from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D, Dropout
-    from keras.models import Sequential, Model
-    from keras.optimizers import adam_v2
-    import tensorflow as tf
-    import keras.layers.merge as merge
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import os
+# if __name__=="__main__":
+poo = ds.init_proc()
+from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D, Dropout
+from keras.models import Sequential, Model
+from keras.optimizers import adam_v2
+import tensorflow as tf
+import keras.layers.merge as merge
+import numpy as np
+import matplotlib.pyplot as plt
+import os
 
 class GAN():
     def __init__(self, data, output):
@@ -186,8 +186,8 @@ if __name__ == '__main__':
     
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
     for i in gpus:
-        tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=78272)])
-        # tf.config.experimental.set_memory_growth(i,True)
+        # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=78272)])
+        tf.config.experimental.set_memory_growth(i,True)
 
     gan = GAN('/gemini/data-1/','/gemini/output/')
     # gan = GAN('data/','')
