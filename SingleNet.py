@@ -1,6 +1,6 @@
 import ds_gpu as ds
-# if __name__=="__main__":
-poo = ds.init_proc()
+if __name__=="__main__":
+    poo = ds.init_proc()
 from keras.layers import Input, Dense, Reshape, Flatten, LeakyReLU, BatchNormalization, Conv2D, Conv2DTranspose, Activation, ReLU, MaxPool2D, Dropout
 from keras.models import Sequential, Model
 from keras.optimizers import adam_v2

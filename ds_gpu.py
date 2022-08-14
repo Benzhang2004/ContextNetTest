@@ -1,9 +1,9 @@
 import os
 from random import randint
-from PIL import Image
-from multiprocessing.dummy import Pool
+from multiprocessing import Pool
 import numpy as np
 import tensorflow as tf
+import gc
 import cv2
 
 doc_data = '/gemini/data-1/'
@@ -19,9 +19,9 @@ for p in l:
     li += [doc_data+'train/'+p+'/'+i for i in os.listdir(doc_data+'train/'+p) if i.split('.')[-1]== 'jpg']
 
 
-X_train = []
-Y_train = []
-y_train = []
+# X_train = []
+# Y_train = []
+# y_train = []
 Y_test = []
 X_test = []
 y_test = []
@@ -29,12 +29,6 @@ y_test = []
 MAX_VAL = 180
 COLOR_table = []
 batch_size = 512
-
-for i in range(256):
-    if(i<MAX_VAL):
-        COLOR_table.append(1)
-    else:
-        COLOR_table.append(0)
 
 def uniform_random(left, right, size=None):
     rand_nums = (right - left) * np.random.random(size) + left
@@ -56,7 +50,7 @@ def random_polygon(edge_num, center, radius_range):
 
 def _pool_init():
     global tf, batch_size
-    # import tensorflow as tf
+    import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
     for i in gpus:
         # tf.config.experimental.set_virtual_device_configuration(i,[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=24576)])
@@ -65,17 +59,18 @@ def _pool_init():
 def init_proc():
     poo = Pool(processes=8,initializer=_pool_init)
     return poo
+    pass
 
 ## preprocessing training data
 def process_tr_data(idx):
     Y_train=[]
     y_train=[]
     for (x, item) in enumerate(li[idx * batch_size:(idx + 1) * batch_size]):
-        im = Image.open(item)
-        im = im.resize((224,224))
-        im=im.convert('L')
-        im=im.point(COLOR_table,'L')
-        imgarr = np.asarray(im)
+        imd = cv2.imread(item,cv2.IMREAD_GRAYSCALE)
+        imd = cv2.resize(imd,(224,224))
+        imd = np.where(imd<MAX_VAL,1,0)
+        im = np.array(imd,copy=True)
+        gc.collect()
         # X_train.append(np.asarray(im.resize((224,224))))
         mask = np.zeros((224,224),dtype=np.uint8)
         r1 = randint(3,16)
@@ -83,17 +78,18 @@ def process_tr_data(idx):
         points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
         mask = cv2.fillPoly(mask, [points1], (255))
         mask = np.asarray(mask)
-        imgarray = np.where(mask>0,-1,imgarr)
+        imgarray = np.where(mask>0,-1,im)
         Y_train.append(imgarray)
         # ytr = np.asarray(Image.fromarray(imgarray).resize((224,224)))
-        ytr = np.multiply(np.where(imgarray < 0, 1, 0),imgarr)
+        ytr = np.multiply(np.where(imgarray < 0, 1, 0),im)
         y_train.append(ytr)
     Y_train = np.array(Y_train)
     y_train = np.array(y_train)
     with tf.device('/GPU:0'):
         Y_train = tf.constant(Y_train.tolist())
         y_train = tf.constant(y_train.tolist())
-    print(type(Y_train))
+    print('put batch: ',idx)
+    gc.collect()
     return Y_train, y_train
 
 def Generator(seq):
@@ -102,10 +98,13 @@ def Generator(seq):
             yield item
 
 
-def load_train_data(poo: Pool,b_size):
+def load_train_data(poo,b_size):
     # global tf
     # import tensorflow as tf
     l = range(len(li)//batch_size)
+    # rtn = []
+    # for i in l:
+    #     rtn.append(process_tr_data(i))
     rtn = poo.map(process_tr_data, l)
     poo.close()
     poo.join()
@@ -125,11 +124,9 @@ def process_tst_data():
     li = [i for i in li if i.split('.')[-1]== 'jpg']
 
     for (x, item) in enumerate(li):
-        im = Image.open(doc_data+'test/'+item)
-        im = im.resize((224,224))
-        im=im.convert('L')
-        im=im.point(COLOR_table,'L')
-        imgarray = np.asarray(im)
+        im = cv2.imread(doc_data+'test/'+item,cv2.IMREAD_GRAYSCALE)
+        im = cv2.resize(im,(224,224))
+        im = np.where(im<MAX_VAL,1,0)
         X_test.append(np.asarray(im.resize((224,224))))
         mask = np.zeros((224,224),dtype=np.uint8)
         r1 = randint(3,63)
@@ -137,10 +134,10 @@ def process_tst_data():
         points1 = random_polygon(40, [randint(r1//2,224-r1//2), randint(r2//2,224-r2//2)], [r1, r2])
         mask = cv2.fillPoly(mask, [points1], (255))
         mask = np.asarray(mask)
-        imgarray = np.where(mask>0,-1,imgarray)
+        imgarray = np.where(mask>0,-1,im)
         Y_test.append(imgarray)
-        yte = np.asarray(Image.fromarray(imgarray).resize((224,224)))
-        y_test.append(yte)
+        # yte = np.asarray(Image.fromarray(imgarray).resize((224,224)))
+        # y_test.append(yte)
 
 
     X_test = np.array(X_test)
