@@ -68,8 +68,10 @@ def process_tr_data(idx):
     for (x, item) in enumerate(li[idx * batch_size:(idx + 1) * batch_size]):
         imd = cv2.imread(item,cv2.IMREAD_GRAYSCALE)
         imd = cv2.resize(imd,(224,224))
-        imd = np.where(imd<MAX_VAL,1,0)
+        imd = np.where(imd<MAX_VAL,1.0,0)
+        # imd = np.ones((224,224))
         im = np.array(imd,copy=True)
+        del imd
         gc.collect()
         # X_train.append(np.asarray(im.resize((224,224))))
         mask = np.zeros((224,224),dtype=np.uint8)
@@ -83,16 +85,21 @@ def process_tr_data(idx):
         # ytr = np.asarray(Image.fromarray(imgarray).resize((224,224)))
         ytr = np.multiply(np.where(imgarray < 0, 1, 0),im)
         y_train.append(ytr)
-    Y_train = np.array(Y_train)
-    y_train = np.array(y_train)
-    a=Y_train.tolist()
-    b=y_train.tolist()
+        del mask, im, imgarray, r1, r2, points1, ytr
+        # Y_train.append(np.ones((224,224)))
+        # y_train.append(np.ones((224,224)))
+    Y = np.array(Y_train)
+    y = np.array(y_train)
+    del Y_train, y_train
+    a=Y.tolist()
+    b=y.tolist()
     c=[]
     d=[]
     with tf.device('/GPU:0'):
         c = tf.constant(a)
         d = tf.constant(b)
     print('put batch: ',idx)
+    del a,b, Y,y
     gc.collect()
     return c, d
 
