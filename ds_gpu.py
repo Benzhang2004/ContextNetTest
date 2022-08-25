@@ -85,12 +85,16 @@ def process_tr_data(idx):
         y_train.append(ytr)
     Y_train = np.array(Y_train)
     y_train = np.array(y_train)
+    a=Y_train.tolist()
+    b=y_train.tolist()
+    c=[]
+    d=[]
     with tf.device('/GPU:0'):
-        Y_train = tf.constant(Y_train.tolist())
-        y_train = tf.constant(y_train.tolist())
+        c = tf.constant(a)
+        d = tf.constant(b)
     print('put batch: ',idx)
     gc.collect()
-    return Y_train, y_train
+    return c, d
 
 def Generator(seq):
     while True:
